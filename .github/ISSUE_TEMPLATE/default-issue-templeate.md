@@ -1,7 +1,7 @@
 ---
-name: Issue templeate
-about: Feature 작업 사항을 입력해주세요.
-title: default
+name: Default Issue templeate
+about: 기본 이슈 템플릿입니다. 이슈 생성 시 템플릿을 사용해주세요.
+title: ''
 labels: ''
 assignees: ''
 
