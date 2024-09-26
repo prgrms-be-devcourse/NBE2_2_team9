@@ -14,21 +14,24 @@ CREATE TABLE caregiver
     password     VARCHAR(30) NOT NULL,
     username     VARCHAR(30) NOT NULL,
     email        VARCHAR(50) NOT NULL,
+    phone_number VARCHAR(20) NOT NULL,
+    role         ENUM ('ADMIN', 'USER') NOT NULL,
     image_id     BIGINT,
     created_at   DATETIME(6) NOT NULL,
     modified_at  DATETIME(6),
     PRIMARY KEY (caregiver_id),
     UNIQUE (login_id),
     UNIQUE (email),
-    UNIQUE (image_id)
+    UNIQUE (image_id),
+    UNIQUE (phone_number)
 );
 
-CREATE TABLE caregiver_image
+CREATE TABLE image
 (
     id          BIGINT       NOT NULL AUTO_INCREMENT,
     url         VARCHAR(255) NOT NULL,
-    created_at  DATETIME(6)  NOT NULL,
-    modified_at DATETIME(6),
+    created_at   DATETIME(6) NOT NULL,
+    modified_at  DATETIME(6),
     PRIMARY KEY (id)
 );
 
@@ -39,24 +42,16 @@ CREATE TABLE caretaker
     password     VARCHAR(30) NOT NULL,
     username     VARCHAR(30) NOT NULL,
     email        VARCHAR(50) NOT NULL,
+    phone_number VARCHAR(20) NOT NULL,
+    role         ENUM ('ADMIN', 'USER') NOT NULL,
     image_id     BIGINT,
     created_at   DATETIME(6) NOT NULL,
     modified_at  DATETIME(6),
     PRIMARY KEY (caretaker_id),
     UNIQUE (login_id),
     UNIQUE (email),
-    UNIQUE (image_id)
-);
-
-CREATE TABLE caretaker_image
-(
-    id           BIGINT       NOT NULL AUTO_INCREMENT,
-    caretaker_id BIGINT,
-    url          VARCHAR(255) NOT NULL,
-    created_at   DATETIME(6)  NOT NULL,
-    modified_at  DATETIME(6),
-    PRIMARY KEY (id),
-    FOREIGN KEY (caretaker_id) REFERENCES caretaker (caretaker_id)
+    UNIQUE (image_id),
+    UNIQUE (phone_number)
 );
 
 CREATE TABLE caretaker_caregiver
