@@ -13,7 +13,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(PillBuddyCustomException.class)
     public ResponseEntity<ErrorResponse> handleCustomException(PillBuddyCustomException e) {
-        ErrorResponse response = ErrorResponse.of(e.getErrorCode().getHttpStatus(), e.getErrorCode().getMsg());
+        ErrorResponse response = ErrorResponse.of(e.getErrorCode().getHttpStatus(), e.getMessage());
         log.error("Error Message : {}", e.getErrorCode().getMsg());
         return ResponseEntity.status(response.getHttpStatus()).body(response);
     }
