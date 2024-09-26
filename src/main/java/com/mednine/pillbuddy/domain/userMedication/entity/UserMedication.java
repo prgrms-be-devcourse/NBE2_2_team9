@@ -20,11 +20,8 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+
+import lombok.*;
 
 @Entity
 @Table(name = "user_medication")
@@ -77,4 +74,20 @@ public class UserMedication extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "userMedication", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Record> records = new ArrayList<>();
+
+    public void changeName(String name) {
+        this.name = name;
+    }
+
+    public void changeDescription(String description) {
+        this.description = description;
+    }
+
+    public void changeDosage(Integer dosage) {
+        this.dosage = dosage;
+    }
+
+    public void changeCaretaker(Caretaker caretaker) {
+        this.caretaker = caretaker;
+    }
 }
