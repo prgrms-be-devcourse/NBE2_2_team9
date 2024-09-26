@@ -20,10 +20,6 @@ public class CaretakerImage extends BaseTimeEntity {
     @Column(nullable = false)
     private String url;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "caretaker_id")
-    private Caretaker caretaker;
-
     public void updateUrl(String url) {
         this.url = url;
     }

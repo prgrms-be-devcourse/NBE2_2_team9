@@ -3,14 +3,12 @@ package com.mednine.pillbuddy.domain.user.caretaker.entity;
 import com.mednine.pillbuddy.domain.user.caregiver.entity.Caregiver;
 import com.mednine.pillbuddy.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(name = "caretaker_caregiver")
 @Builder
+@Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CaretakerCaregiver extends BaseTimeEntity {
@@ -25,14 +23,14 @@ public class CaretakerCaregiver extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "caregiver_id")
-    private Caregiver careGiver;
+    private Caregiver caregiver;
 
     // 연관관계 메서드
     public void changeUser(Caretaker caretaker) {
         this.caretaker = caretaker;
     }
 
-    public void changeCareGiver(Caregiver careGiver) {
-        this.careGiver = careGiver;
+    public void changeCareGiver(Caregiver caregiver) {
+        this.caregiver = caregiver;
     }
 }
