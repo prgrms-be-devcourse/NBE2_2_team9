@@ -73,8 +73,26 @@ public class UserMedication extends BaseTimeEntity {
     private Caretaker caretaker;
 
     @OneToMany(mappedBy = "userMedication", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private final List<Notification> notificationList = new ArrayList<>();
+    @Builder.Default
+    private List<Notification> notificationList = new ArrayList<>();
 
     @OneToMany(mappedBy = "userMedication", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private final List<Record> records = new ArrayList<>();
+    @Builder.Default
+    private List<Record> records = new ArrayList<>();
+
+    public void changeName(String name) {
+        this.name = name;
+    }
+
+    public void changeDescription(String description) {
+        this.description = description;
+    }
+
+    public void changeDosage(Integer dosage) {
+        this.dosage = dosage;
+    }
+
+    public void changeCaretaker(Caretaker caretaker) {
+        this.caretaker = caretaker;
+    }
 }
