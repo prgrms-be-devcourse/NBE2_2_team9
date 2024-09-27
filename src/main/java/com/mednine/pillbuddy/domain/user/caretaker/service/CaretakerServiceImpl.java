@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class CaretakerCaregiverService {
+public class CaretakerServiceImpl implements CaretakerService {
 
     private final CaretakerCaregiverRepository caretakerCaregiverRepository;
     private final CaretakerRepository caretakerRepository;

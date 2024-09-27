@@ -15,7 +15,6 @@ import java.util.List;
 
 @SpringBootTest
 public class UserMedicationControllerTest {
-
     @Autowired
     private UserMedicationService userMedicationService;
 

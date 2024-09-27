@@ -9,18 +9,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
-public class CaretakerCaregiverControllerTest {
-
+public class CaretakerControllerTest {
     @Autowired
-    private CaretakerCaregiverController caretakerCaregiverController;
+    private CaretakerController caretakerController;
 
     @Test
     @Transactional
-    public void createCaretakerCaregiver() {
+    public void addCaregiver() {
         Long caretakerId = 2L;
         Long caregiverId = 1L;
 
-        ResponseEntity<CaretakerCaregiverDTO> caretakerCaregiver = caretakerCaregiverController.createCaretakerCaregiver(caretakerId, caregiverId);
+        ResponseEntity<CaretakerCaregiverDTO> caretakerCaregiver = caretakerController.addCaregiver(caretakerId, caregiverId);
 
         Assertions.assertThat(caretakerCaregiver).isNotNull();
         Assertions.assertThat(caretakerCaregiver.getBody()).isNotNull();

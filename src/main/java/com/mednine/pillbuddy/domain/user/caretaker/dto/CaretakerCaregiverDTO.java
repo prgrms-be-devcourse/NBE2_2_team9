@@ -11,7 +11,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CaretakerCaregiverDTO {
-
     private Long id;
     private Caretaker caretaker;
     private Caregiver caregiver;

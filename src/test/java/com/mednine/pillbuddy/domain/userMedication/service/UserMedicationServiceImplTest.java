@@ -16,7 +16,6 @@ import java.util.List;
 
 @SpringBootTest
 public class UserMedicationServiceImplTest {
-
     @Autowired
     private UserMedicationRepository userMedicationRepository;
 

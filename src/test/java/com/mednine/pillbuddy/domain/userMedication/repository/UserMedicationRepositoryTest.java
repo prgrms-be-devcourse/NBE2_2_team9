@@ -10,7 +10,6 @@ import java.util.List;
 
 @SpringBootTest
 public class UserMedicationRepositoryTest {
-
     @Autowired
     public UserMedicationRepository userMedicationRepository;
 
