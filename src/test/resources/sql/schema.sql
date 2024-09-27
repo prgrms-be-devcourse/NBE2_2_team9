@@ -32,7 +32,7 @@ CREATE TABLE image
     url         VARCHAR(255) NOT NULL,
     created_at  DATETIME(6) NOT NULL,
     modified_at DATETIME(6),
-    PRIMARY KEY (id)
+    PRIMARY KEY (image_id)
 );
 
 CREATE TABLE caretaker
