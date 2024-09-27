@@ -12,7 +12,6 @@ import lombok.*;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CaretakerCaregiver extends BaseTimeEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "caretaker_caregiver_id")
@@ -26,12 +25,11 @@ public class CaretakerCaregiver extends BaseTimeEntity {
     @JoinColumn(name = "caregiver_id")
     private Caregiver caregiver;
 
-    // 연관관계 메서드
     public void changeUser(Caretaker caretaker) {
         this.caretaker = caretaker;
     }
 
-    public void changeCareGiver(Caregiver caregiver) {
+    public void changeCaregiver(Caregiver caregiver) {
         this.caregiver = caregiver;
     }
 }

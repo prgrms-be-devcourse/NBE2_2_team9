@@ -1,7 +1,7 @@
 package com.mednine.pillbuddy.domain.user.caretaker.service;
 
 import com.mednine.pillbuddy.domain.user.caregiver.entity.Caregiver;
-import com.mednine.pillbuddy.domain.user.caregiver.repository.CaregiverRepository;
+import com.mednine.pillbuddy.domain.user.caregiver.entity.repository.CaregiverRepository;
 import com.mednine.pillbuddy.domain.user.caretaker.dto.CaretakerCaregiverDTO;
 import com.mednine.pillbuddy.domain.user.caretaker.entity.Caretaker;
 import com.mednine.pillbuddy.domain.user.caretaker.entity.CaretakerCaregiver;
@@ -21,7 +21,6 @@ public class CaretakerServiceImpl implements CaretakerService {
     private final CaretakerRepository caretakerRepository;
     private final CaregiverRepository caregiverRepository;
 
-    @Override
     @Transactional
     public CaretakerCaregiverDTO register(Long caretakerId, Long caregiverId) {
         Caretaker caretaker = caretakerRepository.findById(caretakerId).orElseThrow(
@@ -37,21 +36,11 @@ public class CaretakerServiceImpl implements CaretakerService {
                 .caretaker(caretaker)
                 .build();
 
-        if (caretakerCaregiverRepository.findByCaretakerIdAndCaregiverId(caretakerId, caregiverId).isPresent()) {
+        if (caretakerCaregiverRepository.findByCaretaker_IdAndCaregiver_Id(caretakerId, caregiverId).isPresent()) {
             throw new PillBuddyCustomException(ErrorCode.CARETAKER_CAREGIVER_NOT_REGISTERED);
         }
 
         CaretakerCaregiver savedCaretakerCaregiver = caretakerCaregiverRepository.save(caretakerCaregiver);
         return CaretakerCaregiverDTO.entityToDTO(savedCaretakerCaregiver);
-    }
-
-    @Override
-    @Transactional
-    public void remove(Long caretakerId, Long caregiverId) {
-        CaretakerCaregiver caretakerCaregiver = caretakerCaregiverRepository
-                .findByCaretakerIdAndCaregiverId(caretakerId, caregiverId)
-                .orElseThrow(() -> new PillBuddyCustomException(ErrorCode.CARETAKER_CAREGIVER_NOT_MATCHED));
-
-        caretakerCaregiverRepository.delete(caretakerCaregiver);
     }
 }

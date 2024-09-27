@@ -1,17 +1,10 @@
 package com.mednine.pillbuddy.domain.user.entity;
 
 import com.mednine.pillbuddy.global.entity.BaseTimeEntity;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 
 @MappedSuperclass
 public abstract class User extends BaseTimeEntity {
-
     @Column(name = "username", length = 30, nullable = false)
     private String username;
 

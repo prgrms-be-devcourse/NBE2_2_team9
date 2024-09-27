@@ -36,12 +36,4 @@ public class CaretakerServiceImplTest {
         Assertions.assertThat(register.getCaretaker().getId()).isEqualTo(2);
         Assertions.assertThat(register.getCaregiver().getId()).isEqualTo(1);
     }
-
-    @Test
-    public void caretakerServiceTests3() {
-        Long caretakerId = 2L;
-        Long caregiverId = 2L;
-
-        caretakerService.remove(caretakerId, caregiverId);
-    }
 }
