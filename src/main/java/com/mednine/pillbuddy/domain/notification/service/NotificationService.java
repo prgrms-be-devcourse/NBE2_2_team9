@@ -43,22 +43,15 @@ public class NotificationService {
     }
 
     private LocalDateTime incrementTime(LocalDateTime time, Frequency frequency) {
-        switch (frequency) {
-            case ONCE_A_DAY:
-                return time.plusDays(1);
-            case TWICE_A_DAY:
-                return time.plusHours(12);
-            case THREE_TIMES_A_DAY:
-                return time.plusHours(8);
-            case WEEKLY:
-                return time.plusWeeks(1);
-            case BIWEEKLY:
-                return time.plusWeeks(2);
-            case MONTHLY:
-                return time.plusMonths(1);
-            default:
-                throw new PillBuddyCustomException(ErrorCode.MEDICATION_NOT_VALID);
-        }
+        return switch (frequency) {
+            case ONCE_A_DAY -> time.plusDays(1);
+            case TWICE_A_DAY -> time.plusHours(12);
+            case THREE_TIMES_A_DAY -> time.plusHours(8);
+            case WEEKLY -> time.plusWeeks(1);
+            case BIWEEKLY -> time.plusWeeks(2);
+            case MONTHLY -> time.plusMonths(1);
+            default -> throw new PillBuddyCustomException(ErrorCode.MEDICATION_NOT_VALID);
+        };
     }
 
     public void sendNotifications() {
