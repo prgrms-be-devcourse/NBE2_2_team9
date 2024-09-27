@@ -7,6 +7,5 @@ public enum Frequency {
     THREE_TIMES_A_DAY,
     WEEKLY,
     BIWEEKLY,
-    MONTHLY,
-    AS_NEEDED
+    MONTHLY
 }
