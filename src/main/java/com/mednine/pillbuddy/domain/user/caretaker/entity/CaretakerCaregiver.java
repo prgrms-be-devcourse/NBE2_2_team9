@@ -9,10 +9,10 @@ import lombok.*;
 @Table(name = "caretaker_caregiver")
 @Getter
 @Builder
+@Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CaretakerCaregiver extends BaseTimeEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "caretaker_caregiver_id")
@@ -24,14 +24,13 @@ public class CaretakerCaregiver extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "caregiver_id")
-    private Caregiver careGiver;
+    private Caregiver caregiver;
 
-    // 연관관계 메서드
     public void changeUser(Caretaker caretaker) {
         this.caretaker = caretaker;
     }
 
-    public void changeCareGiver(Caregiver careGiver) {
-        this.careGiver = careGiver;
+    public void changeCaregiver(Caregiver caregiver) {
+        this.caregiver = caregiver;
     }
 }
