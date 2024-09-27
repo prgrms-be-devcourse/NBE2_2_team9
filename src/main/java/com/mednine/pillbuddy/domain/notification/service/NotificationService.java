@@ -50,7 +50,6 @@ public class NotificationService {
             case WEEKLY -> time.plusWeeks(1);
             case BIWEEKLY -> time.plusWeeks(2);
             case MONTHLY -> time.plusMonths(1);
-            default -> throw new PillBuddyCustomException(ErrorCode.MEDICATION_NOT_VALID);
         };
     }
 
