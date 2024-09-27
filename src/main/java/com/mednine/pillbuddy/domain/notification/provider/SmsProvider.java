@@ -1,17 +1,19 @@
 package com.mednine.pillbuddy.domain.notification.provider;
 
 import net.nurigo.sdk.NurigoApp;
+import net.nurigo.sdk.message.exception.NurigoMessageNotReceivedException;
 import net.nurigo.sdk.message.model.Message;
-import net.nurigo.sdk.message.request.SingleMessageSendingRequest;
-import net.nurigo.sdk.message.response.SingleMessageSentResponse;
 import net.nurigo.sdk.message.service.DefaultMessageService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Component;
 
 @Component
+@EnableScheduling
 public class SmsProvider {
 
     private final DefaultMessageService messageService;
+
     public SmsProvider(@Value("${sms.api-key}") String API_KEY,
                        @Value("${sms.api-secret-key}") String API_SECRET_KEY,
                        @Value("${sms.domain}") String DOMAIN) {
@@ -20,16 +22,19 @@ public class SmsProvider {
 
     @Value("${sms.from_number}") String FROM;
 
-    public SingleMessageSentResponse sendSms(String to) {
+    public void sendNotification(String phoneNumber, String medicationName) {
         Message message = new Message();
         message.setFrom(FROM);
-        message.setTo(to);
-        message.setText("약을 복용할 시간입니다.");
+        message.setTo(phoneNumber);
+        message.setText("약 복용 시간입니다: " + medicationName);
 
-
-
-        SingleMessageSentResponse response = messageService.sendOne(new SingleMessageSendingRequest(message));
-        String statusCode = response.getStatusCode();
-        return response;
+        try {
+            messageService.send(message);
+        } catch (NurigoMessageNotReceivedException exception) {
+            System.out.println(exception.getFailedMessageList());
+            System.out.println(exception.getMessage());
+        } catch (Exception exception) {
+            System.out.println(exception.getMessage());
+        }
     }
 }
