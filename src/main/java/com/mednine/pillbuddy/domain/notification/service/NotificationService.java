@@ -3,6 +3,9 @@ package com.mednine.pillbuddy.domain.notification.service;
 import com.mednine.pillbuddy.domain.notification.entity.Notification;
 import com.mednine.pillbuddy.domain.notification.provider.SmsProvider;
 import com.mednine.pillbuddy.domain.notification.repository.NotificationRepository;
+import com.mednine.pillbuddy.domain.user.caregiver.entity.Caregiver;
+import com.mednine.pillbuddy.domain.user.caretaker.entity.CaretakerCaregiver;
+import com.mednine.pillbuddy.domain.user.caretaker.repository.CaretakerCaregiverRepository;
 import com.mednine.pillbuddy.domain.userMedication.entity.Frequency;
 import com.mednine.pillbuddy.domain.userMedication.entity.UserMedication;
 import com.mednine.pillbuddy.domain.userMedication.repository.UserMedicationRepository;
@@ -21,6 +24,7 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final UserMedicationRepository userMedicationRepository;
+    private final CaretakerCaregiverRepository caretakerCaregiverRepository;
     private final SmsProvider smsProvider;
 
     public List<Notification> createNotificationsForUserMedication(Long userMedicationId) {
@@ -62,6 +66,12 @@ public class NotificationService {
             String medicationName = notification.getUserMedication().getName();
             smsProvider.sendNotification(phoneNumber, medicationName);
 
+            List<CaretakerCaregiver> caretakerCaregivers = caretakerCaregiverRepository.findByCaretaker(notification.getCaretaker());
+            for (CaretakerCaregiver caretakerCaregiver : caretakerCaregivers) {
+                Caregiver caregiver = caretakerCaregiver.getCareGiver();
+                String caregiverPhoneNumber = caregiver.getPhoneNumber();
+                smsProvider.sendNotification(caregiverPhoneNumber, medicationName);
+            }
             notificationRepository.delete(notification);
         }
     }
