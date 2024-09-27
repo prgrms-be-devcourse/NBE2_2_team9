@@ -23,3 +23,6 @@ spring:
 logging.level:
   org.hibernate.SQL: debug
   org.hibernate.orm.jdbc.bind: trace
+
+jwt:
+  client-secret: e15f6da6387aed17fc517949bf26ac808dc81446ab913e0a51468025b8c9344e
