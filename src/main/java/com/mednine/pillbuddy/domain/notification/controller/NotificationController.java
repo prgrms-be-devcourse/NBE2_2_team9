@@ -25,7 +25,7 @@ public class NotificationController {
         return ResponseEntity.ok(notifications);
     }
 
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(cron = "0 0 4 * * ?")
     public void checkAndSendNotifications() {
         notificationService.sendNotifications();
     }
