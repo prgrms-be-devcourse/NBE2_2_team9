@@ -24,4 +24,12 @@ public class CaretakerControllerTest {
         Assertions.assertThat(caretakerCaregiver).isNotNull();
         Assertions.assertThat(caretakerCaregiver.getBody()).isNotNull();
     }
+
+    @Test
+    public void caretakerServiceTests3() {
+        Long caretakerId = 2L;
+        Long caregiverId = 2L;
+
+        caretakerController.deleteCaregiver(caretakerId, caregiverId);
+    }
 }
