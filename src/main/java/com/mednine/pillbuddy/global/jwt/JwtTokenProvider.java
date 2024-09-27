@@ -1,5 +1,7 @@
 package com.mednine.pillbuddy.global.jwt;
 
+import com.mednine.pillbuddy.global.exception.ErrorCode;
+import com.mednine.pillbuddy.global.exception.PillBuddyCustomException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -32,28 +34,27 @@ public class JwtTokenProvider {
     private static final String GRANT_TYPE = "Bearer";
 
     private final Key key;
-    private final Long tokenValidTime = 30 * 60 * 1000L; // 토큰 유효기간 30분
+
+    @Value("${jwt.token.access-expiration-time}")
+    private Long accessExpirationTime;
+
+    @Value("${jwt.token.refresh-expiration-time}")
+    private Long refreshExpirationTime;
 
 
-    public JwtTokenProvider(@Value("${jwt.client-secret}") String secretKey) {
+    public JwtTokenProvider(@Value("${jwt.token.client-secret}") String secretKey) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
     // JwtToken 생성
     public JwtToken generateToken(Authentication authentication) {
-        // 권한 가져오기
-        String authorities = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(","));
-
         long now = (new Date()).getTime();
+        Date accessTokenExpireDate = new Date(now + accessExpirationTime);
+        Date refreshTokenExpireDate = new Date(now + refreshExpirationTime);
 
-        // Access Token 생성
-        Date accessTokenExpiresIn = new Date(now + tokenValidTime);
-
-        String accessToken = getAccessToken(authentication.getName(), authorities, accessTokenExpiresIn);
-        String refreshToken = getRefreshToken(now);
+        String accessToken = getAccessToken(authentication, accessTokenExpireDate);
+        String refreshToken = getRefreshToken(refreshTokenExpireDate);
 
         return JwtToken.builder()
                 .grantType(GRANT_TYPE)
@@ -62,43 +63,43 @@ public class JwtTokenProvider {
                 .build();
     }
 
-    private String getAccessToken(String name, String authorities, Date accessTokenExpiresIn) {
+    private String getAccessToken(Authentication authentication, Date accessTokenExpiresIn) {
+        String authorities = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+
         return Jwts.builder()
-                .setSubject(name)
+                .setSubject(authentication.getName())
                 .claim("auth", authorities)
                 .setExpiration(accessTokenExpiresIn)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    private String getRefreshToken(long now) {
+    private String getRefreshToken(Date refreshTokenExpiresIn) {
         return Jwts.builder()
-                .setExpiration(new Date(now + 86400000))
+                .setExpiration(refreshTokenExpiresIn)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    // Jwt 토큰을 복호화하여 토큰에 들어있는 정보를 꺼내는 메서드
     public Authentication getAuthentication(String accessToken) {
-        // Jwt 토큰 복호화
         Claims claims = parseClaims(accessToken);
 
         if (claims.get("auth") == null) {
-            throw new RuntimeException("권한 정보가 없는 토큰입니다.");
+            throw new PillBuddyCustomException(ErrorCode.JWT_TOKEN_INVALID);
         }
 
-        // 클레임에서 권한 정보 가져오기
+        // 권한 정보 가져오기
         Collection<? extends GrantedAuthority> authorities = Arrays.stream(claims.get("auth").toString().split(","))
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
 
         // UserDetails 객체를 만들어서 Authentication return
-        // UserDetails: interface, User: UserDetails를 구현한 class
         UserDetails principal = new User(claims.getSubject(), "", authorities);
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
 
-    // accessToken
     private Claims parseClaims(String accessToken) {
         try {
             return Jwts.parserBuilder()
@@ -107,11 +108,11 @@ public class JwtTokenProvider {
                     .parseClaimsJws(accessToken)
                     .getBody();
         } catch (ExpiredJwtException e) {
-            return e.getClaims();
+            throw new PillBuddyCustomException(ErrorCode.JWT_TOKEN_EXPIRED);
         }
     }
 
-    // 토큰 정보를 검증하는 메서드
+    // 토큰 검증 메서드
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder()
@@ -120,15 +121,12 @@ public class JwtTokenProvider {
                     .parseClaimsJws(token);
             return true;
         } catch (SecurityException | MalformedJwtException e) {
-            log.info("Invalid JWT Token", e);
+            throw new PillBuddyCustomException(ErrorCode.JWT_TOKEN_INVALID);
         } catch (ExpiredJwtException e) {
-            log.info("Expired JWT Token", e);
+            throw new PillBuddyCustomException(ErrorCode.JWT_TOKEN_EXPIRED);
         } catch (UnsupportedJwtException e) {
-            log.info("Unsupported JWT Token", e);
-        } catch (IllegalArgumentException e) {
-            log.info("JWT claims string is empty.", e);
+            throw new PillBuddyCustomException(ErrorCode.JWT_TOKEN_UNSUPPORTED);
         }
-        return false;
     }
 
     public String resolveToken(HttpServletRequest request) {
