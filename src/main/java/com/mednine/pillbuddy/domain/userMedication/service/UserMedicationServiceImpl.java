@@ -1,7 +1,7 @@
 package com.mednine.pillbuddy.domain.userMedication.service;
 
 import com.mednine.pillbuddy.domain.user.caretaker.entity.Caretaker;
-import com.mednine.pillbuddy.domain.user.caretaker.repository.CareTakerRepository;
+import com.mednine.pillbuddy.domain.user.caretaker.repository.CaretakerRepository;
 import com.mednine.pillbuddy.domain.userMedication.dto.UserMedicationDTO;
 import com.mednine.pillbuddy.domain.userMedication.entity.UserMedication;
 import com.mednine.pillbuddy.domain.userMedication.repository.UserMedicationRepository;
@@ -20,7 +20,7 @@ import java.util.List;
 public class UserMedicationServiceImpl implements UserMedicationService {
 
     private final UserMedicationRepository userMedicationRepository;
-    private final CareTakerRepository caretakerRepository;
+    private final CaretakerRepository caretakerRepository;
 
     @Override
     @Transactional
