@@ -66,7 +66,10 @@ public class NotificationService {
         List<Notification> notifications = notificationRepository.findByNotificationTime(now);
 
         for (Notification notification : notifications) {
-            smsProvider.sendNotification(notification.getCaretaker().getPhoneNumber(), notification.getUserMedication().getName());
+            String phoneNumber = notification.getCaretaker().getPhoneNumber();
+            String medicationName = notification.getUserMedication().getName();
+            smsProvider.sendNotification(phoneNumber, medicationName);
+
             notificationRepository.delete(notification);
         }
     }
