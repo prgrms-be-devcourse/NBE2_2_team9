@@ -1,17 +1,16 @@
-package com.mednine.pillbuddy.controller;
+package com.mednine.pillbuddy.domain.userMedication.controller;
 
 import com.mednine.pillbuddy.domain.userMedication.dto.UserMedicationDTO;
 import com.mednine.pillbuddy.domain.userMedication.entity.Frequency;
 import com.mednine.pillbuddy.domain.userMedication.entity.MedicationType;
 import com.mednine.pillbuddy.domain.userMedication.service.UserMedicationService;
+import java.time.LocalDateTime;
+import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @SpringBootTest
 public class UserMedicationControllerTests {
