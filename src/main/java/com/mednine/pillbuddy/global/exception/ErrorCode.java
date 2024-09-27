@@ -32,9 +32,12 @@ public enum ErrorCode {
     CAREGIVER_NOT_REMOVED(CONFLICT, "보호자 정보 삭제에 실패했습니다."),
     CAREGIVER_NOT_REGISTERED(CONFLICT, "보호자 정보 등록에 실패했습니다."),
     CAREGIVER_NOT_MODIFIED(CONFLICT, "보호자 정보 수정에 실패했습니다."),
-    CAREGIVER_NOT_VALID(BAD_REQUEST, "유효하지 않은 보호자 정보입니다.");
+    CAREGIVER_NOT_VALID(BAD_REQUEST, "유효하지 않은 보호자 정보입니다."),
+
+    CARETAKER_CAREGIVER_NOT_REGISTERED(CONFLICT, "이미 등록된 정보입니다"),
+    CARETAKER_CAREGIVER_NOT_VALID(CONFLICT, "유효하지 않은 정보입니다");
 
 
     private final HttpStatus httpStatus;
-    private final String msg;
+    private final String message;
 }

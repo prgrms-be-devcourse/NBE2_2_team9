@@ -15,11 +15,6 @@ import jakarta.persistence.OneToOne;
 @MappedSuperclass
 public abstract class User extends BaseTimeEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
-    private Long id;
-
     @Column(name = "username", length = 30, nullable = false)
     private String username;
 
