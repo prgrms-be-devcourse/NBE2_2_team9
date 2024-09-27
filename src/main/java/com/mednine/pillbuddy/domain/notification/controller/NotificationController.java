@@ -1,8 +1,10 @@
 package com.mednine.pillbuddy.domain.notification.controller;
 
+import com.mednine.pillbuddy.domain.notification.dto.NotificationDTO;
 import com.mednine.pillbuddy.domain.notification.entity.Notification;
 import com.mednine.pillbuddy.domain.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,8 +22,8 @@ public class NotificationController {
     private final NotificationService notificationService;
 
     @PostMapping("/{userMedicationId}")
-    public ResponseEntity<List<Notification>> createNotifications(@PathVariable Long userMedicationId) {
-        List<Notification> notifications = notificationService.createNotificationsForUserMedication(userMedicationId);
+    public ResponseEntity< List<NotificationDTO>> createNotifications(@PathVariable Long userMedicationId) {
+        List<NotificationDTO> notifications = notificationService.createNotificationsForUserMedication(userMedicationId);
         return ResponseEntity.ok(notifications);
     }
 

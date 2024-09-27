@@ -1,5 +1,6 @@
 package com.mednine.pillbuddy.domain.notification.service;
 
+import com.mednine.pillbuddy.domain.notification.dto.NotificationDTO;
 import com.mednine.pillbuddy.domain.notification.entity.Notification;
 import com.mednine.pillbuddy.domain.notification.provider.SmsProvider;
 import com.mednine.pillbuddy.domain.notification.repository.NotificationRepository;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +29,7 @@ public class NotificationService {
     private final CaretakerCaregiverRepository caretakerCaregiverRepository;
     private final SmsProvider smsProvider;
 
-    public List<Notification> createNotificationsForUserMedication(Long userMedicationId) {
+    public  List<NotificationDTO> createNotificationsForUserMedication(Long userMedicationId) {
         UserMedication userMedication = userMedicationRepository.findById(userMedicationId)
                 .orElseThrow(() -> new PillBuddyCustomException(ErrorCode.MEDICATION_NOT_FOUND));
         LocalDateTime currentTime = userMedication.getStartDate();
@@ -43,7 +45,12 @@ public class NotificationService {
             notifications.add(saved);
             currentTime = incrementTime(currentTime, userMedication.getFrequency());
         }
-        return notifications;
+        return notifications.stream().map(notification -> new NotificationDTO(
+                notification.getId(),
+                notification.getNotificationTime(),
+                notification.getUserMedication().getName(),
+                notification.getCaretaker().getId()
+        )).collect(Collectors.toList());
     }
 
     private LocalDateTime incrementTime(LocalDateTime time, Frequency frequency) {
