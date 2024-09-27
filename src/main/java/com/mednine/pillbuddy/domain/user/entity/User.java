@@ -11,8 +11,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.OneToOne;
+import lombok.Getter;
 
 @MappedSuperclass
+@Getter
 public abstract class User extends BaseTimeEntity {
 
     @Id
