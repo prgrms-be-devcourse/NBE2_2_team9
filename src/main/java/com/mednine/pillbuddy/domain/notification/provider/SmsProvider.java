@@ -20,7 +20,7 @@ public class SmsProvider {
         this.messageService = NurigoApp.INSTANCE.initialize(API_KEY, API_SECRET_KEY, DOMAIN);
     }
 
-    @Value("${sms.from_number}") String FROM;
+    @Value("${sms.from-number}") String FROM;
 
     public void sendNotification(String phoneNumber, String medicationName) {
         Message message = new Message();
