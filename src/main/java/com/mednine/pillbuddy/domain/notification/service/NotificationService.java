@@ -75,7 +75,7 @@ public class NotificationService {
 
             List<CaretakerCaregiver> caretakerCaregivers = caretakerCaregiverRepository.findByCaretaker(notification.getCaretaker());
             for (CaretakerCaregiver caretakerCaregiver : caretakerCaregivers) {
-                Caregiver caregiver = caretakerCaregiver.getCareGiver();
+                Caregiver caregiver = caretakerCaregiver.getCaregiver();
                 String caregiverPhoneNumber = caregiver.getPhoneNumber();
                 smsProvider.sendNotification(caregiverPhoneNumber, medicationName);
             }
