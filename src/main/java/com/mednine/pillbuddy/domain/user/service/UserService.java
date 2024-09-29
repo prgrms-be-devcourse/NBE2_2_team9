@@ -11,6 +11,7 @@ import com.mednine.pillbuddy.global.exception.PillBuddyCustomException;
 import com.mednine.pillbuddy.global.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ public class UserService {
 
     private final CaretakerRepository caretakerRepository;
     private final CaregiverRepository caregiverRepository;
+    private final PasswordEncoder passwordEncoder;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -38,6 +40,8 @@ public class UserService {
                 || caretakerRepository.existsByPhoneNumber(joinDto.getPhoneNumber())) {
             throw new PillBuddyCustomException(ErrorCode.USER_ALREADY_REGISTERED_PHONE_NUMBER);
         }
+
+        joinDto.encodePassword(passwordEncoder);
 
         // 사용자 타입에 따라 회원 저장
         return switch (joinDto.getUserType()) {

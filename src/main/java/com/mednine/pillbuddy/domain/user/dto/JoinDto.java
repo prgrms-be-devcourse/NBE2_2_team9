@@ -10,6 +10,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Getter
 @AllArgsConstructor
@@ -39,6 +40,10 @@ public class JoinDto {
 
     @NotNull
     private UserType userType;
+
+    public void encodePassword(PasswordEncoder passwordEncoder) {
+        this.password = passwordEncoder.encode(password);
+    }
 
     public Caregiver toCaregiverEntity() {
         return Caregiver.builder()

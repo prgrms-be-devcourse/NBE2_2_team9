@@ -11,8 +11,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
+@Transactional
 class UserServiceTest {
 
     @Autowired
@@ -42,7 +44,7 @@ class UserServiceTest {
         String duplicatedEmail = "caretaker1@example.com";
 
         JoinDto joinDto = new JoinDto(
-                "newUser2", "newLoginId2", "newPassword2",
+                "newUser", "newLoginId", "newPassword",
                 duplicatedEmail, "010-1112-2222", UserType.CARETAKER);
 
         assertThatThrownBy(() -> userService.join(joinDto))
@@ -56,8 +58,8 @@ class UserServiceTest {
         String duplicatedLoginId = "caregiver1";
 
         JoinDto joinDto = new JoinDto(
-                "newUser3", duplicatedLoginId, "newPassword3",
-                "new3@gmail.com", "010-1112-2223", UserType.CARETAKER);
+                "newUser", duplicatedLoginId, "newPassword",
+                "new@gmail.com", "010-1112-2223", UserType.CARETAKER);
 
         assertThatThrownBy(() -> userService.join(joinDto))
                 .isInstanceOf(PillBuddyCustomException.class)
@@ -70,8 +72,8 @@ class UserServiceTest {
         String duplicatedPhoneNumber = "010-1234-5678";
 
         JoinDto joinDto = new JoinDto(
-                "newUser4", "newLoginId4", "newPassword4",
-                "new4@gmail.com", duplicatedPhoneNumber, UserType.CARETAKER);
+                "newUser", "newLoginId", "newPassword",
+                "new@gmail.com", duplicatedPhoneNumber, UserType.CARETAKER);
 
         assertThatThrownBy(() -> userService.join(joinDto))
                 .isInstanceOf(PillBuddyCustomException.class)
