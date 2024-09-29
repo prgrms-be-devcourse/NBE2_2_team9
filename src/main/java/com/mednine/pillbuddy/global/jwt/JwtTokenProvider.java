@@ -32,6 +32,7 @@ import org.springframework.util.StringUtils;
 public class JwtTokenProvider {
 
     private static final String GRANT_TYPE = "Bearer";
+    private static final String AUTHORITIES_KEY = "auth";
 
     private final Key key;
 
@@ -70,7 +71,7 @@ public class JwtTokenProvider {
 
         return Jwts.builder()
                 .setSubject(authentication.getName())
-                .claim("auth", authorities)
+                .claim(AUTHORITIES_KEY, authorities)
                 .setExpiration(accessTokenExpiresIn)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
@@ -86,12 +87,13 @@ public class JwtTokenProvider {
     public Authentication getAuthentication(String accessToken) {
         Claims claims = parseClaims(accessToken);
 
-        if (claims.get("auth") == null) {
+        if (claims.get(AUTHORITIES_KEY) == null) {
             throw new PillBuddyCustomException(ErrorCode.JWT_TOKEN_INVALID);
         }
 
         // 권한 정보 가져오기
-        Collection<? extends GrantedAuthority> authorities = Arrays.stream(claims.get("auth").toString().split(","))
+        Collection<? extends GrantedAuthority> authorities = Arrays.stream(
+                        claims.get(AUTHORITIES_KEY).toString().split(","))
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
 

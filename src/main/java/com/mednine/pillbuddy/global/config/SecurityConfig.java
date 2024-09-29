@@ -36,9 +36,11 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
+                // api 테스트 시 편의를 위해 잠시 모든 요청 허용
                 .authorizeHttpRequests(req ->
-                        req.requestMatchers("/api/users/join", "/api/users/login").permitAll()
-                                .anyRequest().authenticated()
+//                        req.requestMatchers("/api/users/join", "/api/users/login").permitAll()
+//                                .anyRequest().authenticated()
+                        req.anyRequest().permitAll()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class)
                 .build();
