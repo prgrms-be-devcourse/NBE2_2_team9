@@ -37,4 +37,11 @@ public class UserController {
 
         return ResponseEntity.ok(jwtToken);
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout() {
+        userService.logout();
+
+        return ResponseEntity.noContent().build();
+    }
 }
