@@ -1,7 +1,8 @@
 package com.mednine.pillbuddy.global.config;
 
+import com.mednine.pillbuddy.global.jwt.JwtAccessDeniedHandler;
+import com.mednine.pillbuddy.global.jwt.JwtAuthenticationEntryPoint;
 import com.mednine.pillbuddy.global.jwt.JwtAuthenticationFilter;
-import com.mednine.pillbuddy.global.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,7 +20,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtTokenProvider tokenProvider;
+    private final JwtAuthenticationFilter authenticationFilter;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+    private final JwtAuthenticationEntryPoint entryPoint;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -32,6 +35,11 @@ public class SecurityConfig {
                 // rest api 사용으로 basic auth 및 csrf 보안 X
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
+                // 예외를 사용자에게 전달하기 위한 entryPoint, exceptionHandler 설정
+                .exceptionHandling(ex -> {
+                    ex.accessDeniedHandler(jwtAccessDeniedHandler);
+                    ex.authenticationEntryPoint(entryPoint);
+                })
                 // jwt 토큰을 사용하기 때문에 세션 사용 X
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -42,7 +50,7 @@ public class SecurityConfig {
 //                                .anyRequest().authenticated()
                                 req.anyRequest().permitAll()
                 )
-                .addFilterBefore(new JwtAuthenticationFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 }
