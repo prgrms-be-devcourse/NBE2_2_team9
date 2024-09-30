@@ -1,7 +1,7 @@
 package com.mednine.pillbuddy.domain.user.caretaker.service;
 
 import com.mednine.pillbuddy.domain.user.caregiver.entity.Caregiver;
-import com.mednine.pillbuddy.domain.user.caregiver.entity.repository.CaregiverRepository;
+import com.mednine.pillbuddy.domain.user.caregiver.repository.CaregiverRepository;
 import com.mednine.pillbuddy.domain.user.caretaker.dto.CaretakerCaregiverDTO;
 import com.mednine.pillbuddy.domain.user.caretaker.entity.Caretaker;
 import com.mednine.pillbuddy.domain.user.caretaker.entity.CaretakerCaregiver;
@@ -37,7 +37,7 @@ public class CaretakerServiceImpl implements CaretakerService {
                 .caretaker(caretaker)
                 .build();
 
-        if (caretakerCaregiverRepository.findByCaretaker_IdAndCaregiver_Id(caretakerId, caregiverId).isPresent()) {
+        if (caretakerCaregiverRepository.findByCaretakerIdAndCaregiverId(caretakerId, caregiverId).isPresent()) {
             throw new PillBuddyCustomException(ErrorCode.CARETAKER_CAREGIVER_NOT_REGISTERED);
         }
 
@@ -49,7 +49,7 @@ public class CaretakerServiceImpl implements CaretakerService {
     @Transactional
     public void remove(Long caretakerId, Long caregiverId) {
         CaretakerCaregiver caretakerCaregiver = caretakerCaregiverRepository
-                .findByCaretaker_IdAndCaregiver_Id(caretakerId, caregiverId)
+                .findByCaretakerIdAndCaregiverId(caretakerId, caregiverId)
                 .orElseThrow(() -> new PillBuddyCustomException(ErrorCode.CARETAKER_CAREGIVER_NOT_MATCHED));
 
         caretakerCaregiverRepository.delete(caretakerCaregiver);
