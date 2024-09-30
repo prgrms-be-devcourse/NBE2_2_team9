@@ -1,10 +1,9 @@
 DROP TABLE IF EXISTS record CASCADE;
+DROP TABLE IF EXISTS image CASCADE;
 DROP TABLE IF EXISTS notification CASCADE;
 DROP TABLE IF EXISTS user_medication CASCADE;
 DROP TABLE IF EXISTS caretaker_caregiver CASCADE;
-DROP TABLE IF EXISTS caretaker_image CASCADE;
 DROP TABLE IF EXISTS caretaker CASCADE;
-DROP TABLE IF EXISTS caregiver_image CASCADE;
 DROP TABLE IF EXISTS caregiver CASCADE;
 
 CREATE TABLE caregiver
@@ -32,7 +31,7 @@ CREATE TABLE image
     url         VARCHAR(255) NOT NULL,
     created_at   DATETIME(6) NOT NULL,
     modified_at  DATETIME(6),
-    PRIMARY KEY (id)
+    PRIMARY KEY (image_id)
 );
 
 CREATE TABLE caretaker
