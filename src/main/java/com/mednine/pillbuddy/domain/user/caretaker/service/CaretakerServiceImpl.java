@@ -1,7 +1,7 @@
 package com.mednine.pillbuddy.domain.user.caretaker.service;
 
 import com.mednine.pillbuddy.domain.user.caregiver.entity.Caregiver;
-import com.mednine.pillbuddy.domain.user.caregiver.repository.CaregiverRepository;
+import com.mednine.pillbuddy.domain.user.caregiver.entity.repository.CaregiverRepository;
 import com.mednine.pillbuddy.domain.user.caretaker.dto.CaretakerCaregiverDTO;
 import com.mednine.pillbuddy.domain.user.caretaker.entity.Caretaker;
 import com.mednine.pillbuddy.domain.user.caretaker.entity.CaretakerCaregiver;
