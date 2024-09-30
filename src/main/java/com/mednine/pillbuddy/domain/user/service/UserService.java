@@ -66,7 +66,6 @@ public class UserService {
                 loginDto.getLoginId(), loginDto.getPassword());
 
         // 사용자 유효성 검증
-        // TODO: 2024-09-30 시큐리티 예외처리 공부 후 추가 예정
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
         return jwtTokenProvider.generateToken(authentication);
