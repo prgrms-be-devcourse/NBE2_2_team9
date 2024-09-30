@@ -81,7 +81,7 @@ class CaretakerRepositoryTest {
         Long caretakerId = 1L;
         Long caregiverId = 1L;
 
-        CaretakerCaregiver caretakerCaregiver = caretakerCaregiverRepository.findByCaretaker_IdAndCaregiver_Id(caretakerId, caregiverId).orElse(null);
+        CaretakerCaregiver caretakerCaregiver = caretakerCaregiverRepository.findByCaretakerIdAndCaregiverId(caretakerId, caregiverId).orElse(null);
 
         assertThat(caretakerCaregiver.getId()).isEqualTo(1);
         assertThat(caretakerCaregiver.getCaretaker().getId()).isEqualTo(1);
