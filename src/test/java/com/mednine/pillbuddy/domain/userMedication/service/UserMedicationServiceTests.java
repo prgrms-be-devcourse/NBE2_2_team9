@@ -1,19 +1,17 @@
-package com.mednine.pillbuddy.service;
+package com.mednine.pillbuddy.domain.userMedication.service;
 
 import com.mednine.pillbuddy.domain.userMedication.dto.UserMedicationDTO;
 import com.mednine.pillbuddy.domain.userMedication.entity.Frequency;
 import com.mednine.pillbuddy.domain.userMedication.entity.MedicationType;
 import com.mednine.pillbuddy.domain.userMedication.entity.UserMedication;
 import com.mednine.pillbuddy.domain.userMedication.repository.UserMedicationRepository;
-import com.mednine.pillbuddy.domain.userMedication.service.UserMedicationService;
+import java.time.LocalDateTime;
+import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @SpringBootTest
 public class UserMedicationServiceTests {
@@ -40,7 +38,8 @@ public class UserMedicationServiceTests {
 
         Assertions.assertThat(userMedicationRepository.findById(userMedicationId).get().getName()).isEqualTo("aspirin");
         Assertions.assertThat(userMedicationRepository.findById(userMedicationId).get().getDosage()).isEqualTo(100);
-        Assertions.assertThat(userMedicationRepository.findById(userMedicationId).get().getDescription()).isEqualTo("loose pain");
+        Assertions.assertThat(userMedicationRepository.findById(userMedicationId).get().getDescription())
+                .isEqualTo("loose pain");
     }
 
     @Test
