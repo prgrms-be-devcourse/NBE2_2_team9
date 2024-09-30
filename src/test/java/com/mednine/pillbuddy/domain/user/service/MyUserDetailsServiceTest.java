@@ -31,7 +31,7 @@ class MyUserDetailsServiceTest {
         assertThat(details.getUsername()).isEqualTo(loginId);
         assertThat(details.getPassword()).isEqualTo("password1");
         assertThat(authorities.size()).isEqualTo(1);
-        assertThat(authorities.iterator().next().getAuthority()).isEqualTo("USER");
+        assertThat(authorities.iterator().next().getAuthority()).isEqualTo("ROLE_USER");
     }
 
     @Test
