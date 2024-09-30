@@ -2,7 +2,6 @@ package com.mednine.pillbuddy.domain.user.service;
 
 import com.mednine.pillbuddy.domain.user.caregiver.repository.CaregiverRepository;
 import com.mednine.pillbuddy.domain.user.caretaker.repository.CaretakerRepository;
-import com.mednine.pillbuddy.domain.user.entity.CustomUserDetails;
 import com.mednine.pillbuddy.global.exception.ErrorCode;
 import com.mednine.pillbuddy.global.exception.PillBuddyCustomException;
 import lombok.RequiredArgsConstructor;

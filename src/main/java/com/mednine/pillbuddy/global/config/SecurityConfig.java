@@ -40,7 +40,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(req ->
 //                        req.requestMatchers("/api/users/join", "/api/users/login").permitAll()
 //                                .anyRequest().authenticated()
-                        req.anyRequest().permitAll()
+                                req.anyRequest().permitAll()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class)
                 .build();

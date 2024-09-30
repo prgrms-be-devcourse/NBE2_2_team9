@@ -3,7 +3,6 @@ package com.mednine.pillbuddy.domain.user.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.mednine.pillbuddy.domain.user.entity.CustomUserDetails;
 import com.mednine.pillbuddy.global.exception.PillBuddyCustomException;
 import java.util.Collection;
 import org.junit.jupiter.api.DisplayName;
