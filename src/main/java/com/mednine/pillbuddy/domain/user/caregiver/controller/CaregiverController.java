@@ -17,7 +17,7 @@ public class CaregiverController {
     private final CaregiverService caregiverService;
 
     @PostMapping
-    public ResponseEntity<CaretakerCaregiverDTO> addCaretaker(@PathVariable Long caregiverId, @RequestBody Long caretakerId) {
+    public ResponseEntity<CaretakerCaregiverDTO> addCaretaker(@PathVariable Long caregiverId, @RequestParam Long caretakerId) {
         CaretakerCaregiverDTO savedCaretakerCaregiverDTO = caregiverService.register(caregiverId, caretakerId);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedCaretakerCaregiverDTO);
     }
