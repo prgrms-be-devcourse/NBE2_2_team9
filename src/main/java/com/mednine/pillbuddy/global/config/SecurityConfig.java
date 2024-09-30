@@ -48,7 +48,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(req ->
 //                        req.requestMatchers("/api/users/join", "/api/users/login").permitAll()
 //                                .anyRequest().authenticated()
-                                req.anyRequest().authenticated()
+                                req.anyRequest().permitAll()
                 )
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
