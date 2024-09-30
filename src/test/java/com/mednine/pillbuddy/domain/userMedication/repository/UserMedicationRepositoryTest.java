@@ -1,7 +1,6 @@
-package com.mednine.pillbuddy.repository;
+package com.mednine.pillbuddy.domain.userMedication.repository;
 
 import com.mednine.pillbuddy.domain.userMedication.entity.UserMedication;
-import com.mednine.pillbuddy.domain.userMedication.repository.UserMedicationRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.List;
 
 @SpringBootTest
-public class UseMedicationRepositoryTests {
-
+public class UserMedicationRepositoryTest {
     @Autowired
     public UserMedicationRepository userMedicationRepository;
 

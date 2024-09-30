@@ -35,7 +35,7 @@ public class CaregiverService {
                 .build();
 
         if (caretakerCaregiverRepository.findByCaretakerIdAndCaregiverId(caretakerId, caregiverId).isPresent()) {
-            throw new PillBuddyCustomException(ErrorCode.CARETAKER_CAREGIVER_NOT_REGISTERED);
+            throw new PillBuddyCustomException(ErrorCode.CAREGIVER_CARETAKER_NOT_REGISTERED);
         }
 
         CaretakerCaregiver savedCaretakerCaregiver = caretakerCaregiverRepository.save(caretakerCaregiver);
@@ -46,7 +46,7 @@ public class CaregiverService {
     public void remove(Long caregiverId, Long caretakerId) {
         CaretakerCaregiver caretakerCaregiver = caretakerCaregiverRepository
                 .findByCaretakerIdAndCaregiverId(caretakerId, caregiverId)
-                .orElseThrow(() -> new PillBuddyCustomException(ErrorCode.CARETAKER_CAREGIVER_NOT_MATCHED));
+                .orElseThrow(() -> new PillBuddyCustomException(ErrorCode.CAREGIVER_CARETAKER_NOT_MATCHED));
 
         caretakerCaregiverRepository.delete(caretakerCaregiver);
     }

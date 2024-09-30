@@ -2,6 +2,7 @@ package com.mednine.pillbuddy.domain.user.caretaker.controller;
 
 import com.mednine.pillbuddy.domain.user.caretaker.dto.CaretakerCaregiverDTO;
 import com.mednine.pillbuddy.domain.user.caretaker.service.CaretakerService;
+import com.mednine.pillbuddy.domain.user.caretaker.service.CaretakerServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,3 +30,4 @@ public class CaretakerController {
         return ResponseEntity.ok(result);
     }
 }
+
