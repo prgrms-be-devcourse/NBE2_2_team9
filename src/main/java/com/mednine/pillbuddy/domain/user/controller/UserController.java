@@ -1,8 +1,10 @@
 package com.mednine.pillbuddy.domain.user.controller;
 
 import com.mednine.pillbuddy.domain.user.dto.JoinDto;
+import com.mednine.pillbuddy.domain.user.dto.LoginDto;
 import com.mednine.pillbuddy.domain.user.dto.UserDto;
 import com.mednine.pillbuddy.domain.user.service.UserService;
+import com.mednine.pillbuddy.global.jwt.JwtToken;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -26,5 +28,13 @@ public class UserController {
         UserDto userDto = userService.join(joinDto);
 
         return ResponseEntity.ok(userDto);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<JwtToken> login(@RequestBody LoginDto loginDto) {
+        log.info("-- UserController.login() called !!");
+        JwtToken jwtToken = userService.login(loginDto);
+
+        return ResponseEntity.ok(jwtToken);
     }
 }
