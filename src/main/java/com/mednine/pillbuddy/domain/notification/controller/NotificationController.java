@@ -23,7 +23,7 @@ public class NotificationController {
 
     @PostMapping("/{userMedicationId}")
     public ResponseEntity< List<NotificationDTO>> createNotifications(@PathVariable Long userMedicationId) {
-        List<NotificationDTO> notifications = notificationService.createNotificationsForUserMedication(userMedicationId);
+        List<NotificationDTO> notifications = notificationService.createNotifications(userMedicationId);
         return ResponseEntity.ok(notifications);
     }
 
