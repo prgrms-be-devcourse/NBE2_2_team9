@@ -13,15 +13,18 @@ import com.mednine.pillbuddy.domain.userMedication.repository.UserMedicationRepo
 import com.mednine.pillbuddy.global.exception.ErrorCode;
 import com.mednine.pillbuddy.global.exception.PillBuddyCustomException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Log4j2
+@Transactional
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
@@ -29,11 +32,17 @@ public class NotificationService {
     private final CaretakerCaregiverRepository caretakerCaregiverRepository;
     private final SmsProvider smsProvider;
 
-    public  List<NotificationDTO> createNotificationsForUserMedication(Long userMedicationId) {
+    //알림 생성
+    public List<NotificationDTO> createNotifications(Long userMedicationId) {
         UserMedication userMedication = userMedicationRepository.findById(userMedicationId)
                 .orElseThrow(() -> new PillBuddyCustomException(ErrorCode.MEDICATION_NOT_FOUND));
-        LocalDateTime currentTime = userMedication.getStartDate();
 
+        List<Notification> notifications = generateNotifications(userMedication);
+        return NotificationDTO.convertToDTOs(notifications);
+    }
+
+    public List<Notification> generateNotifications(UserMedication userMedication) {
+        LocalDateTime currentTime = userMedication.getStartDate();
         List<Notification> notifications = new ArrayList<>();
         while (currentTime.isBefore(userMedication.getEndDate())) {
             Notification notification = Notification.builder()
@@ -41,16 +50,10 @@ public class NotificationService {
                     .userMedication(userMedication)
                     .caretaker(userMedication.getCaretaker())
                     .build();
-            Notification saved = notificationRepository.save(notification);
-            notifications.add(saved);
+            notifications.add(notification);
             currentTime = incrementTime(currentTime, userMedication.getFrequency());
         }
-        return notifications.stream().map(notification -> new NotificationDTO(
-                notification.getId(),
-                notification.getNotificationTime(),
-                notification.getUserMedication().getName(),
-                notification.getCaretaker().getId()
-        )).collect(Collectors.toList());
+        return notificationRepository.saveAll(notifications);
     }
 
     private LocalDateTime incrementTime(LocalDateTime time, Frequency frequency) {
@@ -64,22 +67,44 @@ public class NotificationService {
         };
     }
 
+    //메세지 전송
     public void sendNotifications() {
         LocalDateTime now = LocalDateTime.now();
         List<Notification> notifications = notificationRepository.findByNotificationTime(now);
 
-        for (Notification notification : notifications) {
-            String phoneNumber = notification.getCaretaker().getPhoneNumber();
-            String medicationName = notification.getUserMedication().getName();
-            smsProvider.sendNotification(phoneNumber, medicationName);
-
-            List<CaretakerCaregiver> caretakerCaregivers = caretakerCaregiverRepository.findByCaretaker(notification.getCaretaker());
-            for (CaretakerCaregiver caretakerCaregiver : caretakerCaregivers) {
-                Caregiver caregiver = caretakerCaregiver.getCaregiver();
-                String caregiverPhoneNumber = caregiver.getPhoneNumber();
-                smsProvider.sendNotification(caregiverPhoneNumber, medicationName);
+        if (notifications != null && !notifications.isEmpty()) {
+            for (Notification notification : notifications) {
+                sendNotificationToCaretaker(notification);
+                sendNotificationToCaregivers(notification);
+                notificationRepository.delete(notification);
             }
-            notificationRepository.delete(notification);
+        }
+    }
+
+    private void sendNotificationToCaretaker(Notification notification) {
+        String phoneNumber = notification.getCaretaker().getPhoneNumber();
+        String medicationName = notification.getUserMedication().getName();
+        try {
+            smsProvider.sendNotification(phoneNumber, medicationName);
+            log.info("Caretaker에게 메세지 전송 성공");
+        } catch (Exception e) {
+            throw new PillBuddyCustomException(ErrorCode.MESSAGE_SEND_FAILED);
+        }
+    }
+
+    private void sendNotificationToCaregivers(Notification notification) {
+        List<CaretakerCaregiver> caretakerCaregivers = caretakerCaregiverRepository.findByCaretaker(notification.getCaretaker());
+        String medicationName = notification.getUserMedication().getName();
+
+        for (CaretakerCaregiver caretakerCaregiver : caretakerCaregivers) {
+            Caregiver caregiver = caretakerCaregiver.getCaregiver();
+            String caregiverPhoneNumber = caregiver.getPhoneNumber();
+            try {
+                smsProvider.sendNotification(caregiverPhoneNumber, medicationName);
+                log.info("Caregiver에게 메세지 전송 성공");
+            } catch (Exception e) {
+                throw new PillBuddyCustomException(ErrorCode.MESSAGE_SEND_FAILED);
+            }
         }
     }
 }
