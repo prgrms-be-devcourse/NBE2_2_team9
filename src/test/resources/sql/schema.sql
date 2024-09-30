@@ -1,8 +1,8 @@
 DROP TABLE IF EXISTS record CASCADE;
+DROP TABLE IF EXISTS image CASCADE;
 DROP TABLE IF EXISTS notification CASCADE;
 DROP TABLE IF EXISTS user_medication CASCADE;
 DROP TABLE IF EXISTS caretaker_caregiver CASCADE;
-DROP TABLE IF EXISTS image CASCADE;
 DROP TABLE IF EXISTS caretaker CASCADE;
 DROP TABLE IF EXISTS caregiver CASCADE;
 
@@ -10,7 +10,7 @@ CREATE TABLE image
 (
     image_id    BIGINT       NOT NULL AUTO_INCREMENT,
     url         VARCHAR(255) NOT NULL,
-    created_at  DATETIME(6) NOT NULL,
+    created_at  DATETIME(6)  NOT NULL,
     modified_at DATETIME(6),
     PRIMARY KEY (image_id)
 );
@@ -19,7 +19,7 @@ CREATE TABLE caregiver
 (
     caregiver_id BIGINT      NOT NULL AUTO_INCREMENT,
     login_id     VARCHAR(20) NOT NULL,
-    password     VARCHAR(255) NOT NULL,
+    password     VARCHAR(255)NOT NULL,
     username     VARCHAR(30) NOT NULL,
     email        VARCHAR(50) NOT NULL,
     phone_number VARCHAR(20) NOT NULL,

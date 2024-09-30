@@ -2,6 +2,7 @@ package com.mednine.pillbuddy.domain.user.caretaker.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.mednine.pillbuddy.domain.user.caretaker.entity.CaretakerCaregiver;
 import com.mednine.pillbuddy.domain.user.caretaker.entity.Caretaker;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,6 +14,9 @@ class CaretakerRepositoryTest {
 
     @Autowired
     private CaretakerRepository caretakerRepository;
+
+    @Autowired
+    public CaretakerCaregiverRepository caretakerCaregiverRepository;
 
     @Test
     @DisplayName("loginID 를 통해 사용자를 조회할 수 있다.")
@@ -70,5 +74,17 @@ class CaretakerRepositoryTest {
 
         // then
         assertThat(result).isTrue();
+    }
+
+    @Test
+    public void caretakerCaregiverRepositoryTest() {
+        Long caretakerId = 1L;
+        Long caregiverId = 1L;
+
+        CaretakerCaregiver caretakerCaregiver = caretakerCaregiverRepository.findByCaretaker_IdAndCaregiver_Id(caretakerId, caregiverId).orElse(null);
+
+        assertThat(caretakerCaregiver.getId()).isEqualTo(1);
+        assertThat(caretakerCaregiver.getCaretaker().getId()).isEqualTo(1);
+        assertThat(caregiverId).isEqualTo(1);
     }
 }

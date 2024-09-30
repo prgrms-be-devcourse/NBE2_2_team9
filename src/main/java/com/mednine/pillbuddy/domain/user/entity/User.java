@@ -21,7 +21,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public abstract class User extends BaseTimeEntity {
-
+  
     @Column(name = "username", length = 30, nullable = false)
     private String username;
 
