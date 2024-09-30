@@ -13,6 +13,12 @@ logging:
     org.hibernate.SQL: DEBUG
     org.hibernate.orm.jdbc.bind: TRACE
 
+jwt:
+  token:
+    client-secret: e15f6da6387aed17fc517949bf26ac808dc81446ab913e0a51468025b8c9344e
+    access-expiration-time: 3600000 # 60분
+    refresh-expiration-time: 18000000  # 5시간
+
 sms:
   api-key: ${API_KEY}
   api-secret-key: ${API_SECRET}

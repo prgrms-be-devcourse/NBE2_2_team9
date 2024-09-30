@@ -6,11 +6,20 @@ DROP TABLE IF EXISTS caretaker_caregiver CASCADE;
 DROP TABLE IF EXISTS caretaker CASCADE;
 DROP TABLE IF EXISTS caregiver CASCADE;
 
+CREATE TABLE image
+(
+    image_id    BIGINT       NOT NULL AUTO_INCREMENT,
+    url         VARCHAR(255) NOT NULL,
+    created_at  DATETIME(6)  NOT NULL,
+    modified_at DATETIME(6),
+    PRIMARY KEY (image_id)
+);
+
 CREATE TABLE caregiver
 (
     caregiver_id BIGINT      NOT NULL AUTO_INCREMENT,
     login_id     VARCHAR(20) NOT NULL,
-    password     VARCHAR(30) NOT NULL,
+    password     VARCHAR(255)NOT NULL,
     username     VARCHAR(30) NOT NULL,
     email        VARCHAR(50) NOT NULL,
     phone_number VARCHAR(20) NOT NULL,
@@ -19,26 +28,18 @@ CREATE TABLE caregiver
     created_at   DATETIME(6) NOT NULL,
     modified_at  DATETIME(6),
     PRIMARY KEY (caregiver_id),
+    FOREIGN KEY (image_id) references image(image_id),
     UNIQUE (login_id),
     UNIQUE (email),
     UNIQUE (image_id),
     UNIQUE (phone_number)
 );
 
-CREATE TABLE image
-(
-    image_id          BIGINT       NOT NULL AUTO_INCREMENT,
-    url         VARCHAR(255) NOT NULL,
-    created_at   DATETIME(6) NOT NULL,
-    modified_at  DATETIME(6),
-    PRIMARY KEY (id)
-);
-
 CREATE TABLE caretaker
 (
     caretaker_id BIGINT      NOT NULL AUTO_INCREMENT,
     login_id     VARCHAR(20) NOT NULL,
-    password     VARCHAR(30) NOT NULL,
+    password     VARCHAR(255) NOT NULL,
     username     VARCHAR(30) NOT NULL,
     email        VARCHAR(50) NOT NULL,
     phone_number VARCHAR(20) NOT NULL,
@@ -47,6 +48,7 @@ CREATE TABLE caretaker
     created_at   DATETIME(6) NOT NULL,
     modified_at  DATETIME(6),
     PRIMARY KEY (caretaker_id),
+    FOREIGN KEY (image_id) references image(image_id),
     UNIQUE (login_id),
     UNIQUE (email),
     UNIQUE (image_id),
