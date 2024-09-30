@@ -48,6 +48,7 @@ public enum ErrorCode {
     CARETAKER_CAREGIVER_NOT_VALID(CONFLICT, "유효하지 않은 보호자 정보입니다"),
     CARETAKER_CAREGIVER_NOT_MATCHED(BAD_REQUEST, "보호자 정보가 일치하지 않습니다"),
 
+
     //e약은요 API 예외
     REQUIRED_VALUE(BAD_REQUEST,"제품명은 필수입니다."),
     OUT_OF_PAGE(BAD_REQUEST,"페이지 설정이 잘못됐습니다."),
