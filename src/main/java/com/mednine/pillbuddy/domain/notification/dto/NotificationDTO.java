@@ -1,23 +1,30 @@
 package com.mednine.pillbuddy.domain.notification.dto;
 
+import com.mednine.pillbuddy.domain.notification.entity.Notification;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
-@NoArgsConstructor
+@Builder
+@AllArgsConstructor
 public class NotificationDTO {
     private Long notificationId;
     private LocalDateTime notificationTime;
     private String medicationName;
     private Long caretakerId;
 
-
-    public NotificationDTO(Long notificationId, LocalDateTime notificationTime, String medicationName, Long caretakerId) {
-        this.notificationId = notificationId;
-        this.notificationTime = notificationTime;
-        this.medicationName = medicationName;
-        this.caretakerId = caretakerId;
+    public static List<NotificationDTO> convertToDTOs(List<Notification> notifications) {
+        return notifications.stream()
+                .map(notification -> NotificationDTO.builder()
+                        .notificationId(notification.getId())
+                        .notificationTime(notification.getNotificationTime())
+                        .medicationName(notification.getUserMedication().getName())
+                        .caretakerId(notification.getCaretaker().getId()).build())
+                .collect(Collectors.toList());
     }
 }
