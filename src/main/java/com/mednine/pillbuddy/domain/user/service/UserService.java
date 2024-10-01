@@ -1,18 +1,22 @@
 package com.mednine.pillbuddy.domain.user.service;
 
-import com.mednine.pillbuddy.domain.user.caregiver.entity.Caregiver;
 import com.mednine.pillbuddy.domain.user.caregiver.repository.CaregiverRepository;
-import com.mednine.pillbuddy.domain.user.caretaker.entity.Caretaker;
 import com.mednine.pillbuddy.domain.user.caretaker.repository.CaretakerRepository;
 import com.mednine.pillbuddy.domain.user.dto.JoinDto;
+import com.mednine.pillbuddy.domain.user.dto.LoginDto;
 import com.mednine.pillbuddy.domain.user.dto.UserDto;
 import com.mednine.pillbuddy.global.exception.ErrorCode;
 import com.mednine.pillbuddy.global.exception.PillBuddyCustomException;
+import com.mednine.pillbuddy.global.jwt.JwtToken;
 import com.mednine.pillbuddy.global.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -27,6 +31,51 @@ public class UserService {
     private final JwtTokenProvider jwtTokenProvider;
 
     public UserDto join(JoinDto joinDto) {
+        validateJoinInfo(joinDto);
+        joinDto.encodePassword(passwordEncoder);
+
+        // 사용자 타입에 따라 회원 저장
+        return switch (joinDto.getUserType()) {
+            case CAREGIVER -> new UserDto(caregiverRepository.save(joinDto.toCaregiverEntity()));
+            case CARETAKER -> new UserDto(caretakerRepository.save(joinDto.toCaretakerEntity()));
+        };
+    }
+
+    @Transactional(readOnly = true)
+    public JwtToken login(LoginDto loginDto) {
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                loginDto.getLoginId(), loginDto.getPassword());
+
+        // 사용자 유효성 검증
+        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+
+        return jwtTokenProvider.generateToken(authentication);
+    }
+
+    @Transactional(propagation = Propagation.NEVER)
+    public void logout() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null) {
+            throw new PillBuddyCustomException(ErrorCode.USER_AUTHENTICATION_REQUIRED);
+        }
+        SecurityContextHolder.clearContext();
+    }
+
+    @Transactional(readOnly = true)
+    public JwtToken reissueToken(String bearerToken) {
+        // 토큰 가져오기
+        String refreshToken = jwtTokenProvider.resolveToken(bearerToken);
+
+        // 토큰 유효성 검사
+        if (refreshToken == null || !jwtTokenProvider.validateToken(refreshToken)) {
+            throw new PillBuddyCustomException(ErrorCode.JWT_TOKEN_INVALID);
+        }
+
+        return jwtTokenProvider.reissueAccessToken(refreshToken);
+    }
+
+    private void validateJoinInfo(JoinDto joinDto) {
         // 회원가입 유효성 검증
         if (caregiverRepository.existsByLoginId(joinDto.getLoginId()) || caretakerRepository.existsByLoginId(
                 joinDto.getLoginId())) {
@@ -40,19 +89,5 @@ public class UserService {
                 || caretakerRepository.existsByPhoneNumber(joinDto.getPhoneNumber())) {
             throw new PillBuddyCustomException(ErrorCode.USER_ALREADY_REGISTERED_PHONE_NUMBER);
         }
-
-        joinDto.encodePassword(passwordEncoder);
-
-        // 사용자 타입에 따라 회원 저장
-        return switch (joinDto.getUserType()) {
-            case CAREGIVER -> {
-                Caregiver savedCaregiver = caregiverRepository.save(joinDto.toCaregiverEntity());
-                yield new UserDto(savedCaregiver);
-            }
-            case CARETAKER -> {
-                Caretaker savedCaretaker = caretakerRepository.save(joinDto.toCaretakerEntity());
-                yield new UserDto(savedCaretaker);
-            }
-        };
     }
 }
