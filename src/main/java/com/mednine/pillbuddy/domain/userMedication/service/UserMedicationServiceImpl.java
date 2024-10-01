@@ -1,5 +1,7 @@
 package com.mednine.pillbuddy.domain.userMedication.service;
 
+import com.mednine.pillbuddy.domain.record.dto.RecordDTO;
+import com.mednine.pillbuddy.domain.record.entity.Record;
 import com.mednine.pillbuddy.domain.user.caretaker.entity.Caretaker;
 import com.mednine.pillbuddy.domain.user.caretaker.repository.CaretakerRepository;
 import com.mednine.pillbuddy.domain.userMedication.dto.UserMedicationDTO;
@@ -12,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -67,5 +71,22 @@ public class UserMedicationServiceImpl implements UserMedicationService {
             log.error(e.getMessage());
             throw e;
         }
+    }
+
+    @Override
+    public List<RecordDTO> getUserMedicationRecordsByDate(Long caretakerId, LocalDateTime date) {
+        List<UserMedication> userMedications = userMedicationRepository.findByCaretakerId(caretakerId);
+        List<RecordDTO> recordDTOList = new ArrayList<>();
+
+        for (UserMedication medication : userMedications) {
+            List<Record> records = medication.getRecords().stream()
+                    .filter(record -> record.getDate().toLocalDate().equals(date.toLocalDate()))
+                    .toList();
+
+            for (Record record : records) {
+                recordDTOList.add(new RecordDTO(record));
+            }
+        }
+        return recordDTOList;
     }
 }

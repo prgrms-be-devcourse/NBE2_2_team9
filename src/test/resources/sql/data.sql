@@ -8,7 +8,8 @@ VALUES ('2024-09-25 15:00:00.000000', '2024-09-25 15:00:00.000000', 'https://exa
 -- caregiver
 INSERT INTO caregiver (login_id, password, username, email, phone_number, role, image_id, created_at, modified_at)
 VALUES ('caregiver1', 'password1', 'Caregiver One', 'caregiver1@example.com', '010-1234-5678', 'USER', 1, '2024-09-25 15:00:00.000000', '2024-09-25 15:00:00.000000'),
-       ('caregiver2', 'password2', 'Caregiver Two', 'caregiver2@example.com', '010-2345-6789', 'USER', 2, '2024-09-25 15:10:00.000000', '2024-09-25 15:10:00.000000');
+       ('caregiver2', 'password2', 'Caregiver Two', 'caregiver2@example.com', '010-2345-6789', 'USER', 2, '2024-09-25 15:10:00.000000', '2024-09-25 15:10:00.000000'),
+       ('caregiver3', '$2a$12$0izv1Sw7JFxpsb8IlzrEhulK2jZBCuM7MTt4lceivUgqkSZSGswze', 'Caregiver Three', 'caregiver3@example.com', '010-3456-7890', 'USER', null, '2024-09-25 15:10:00.000000', '2024-09-25 15:10:00.000000');
 
 -- caretaker
 INSERT INTO caretaker (login_id, password, username, email, phone_number, role, image_id, created_at, modified_at)

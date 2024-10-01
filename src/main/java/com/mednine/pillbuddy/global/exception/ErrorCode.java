@@ -36,6 +36,7 @@ public enum ErrorCode {
     CARETAKER_NOT_REGISTERED(CONFLICT, "사용자 정보 등록에 실패했습니다."),
     CARETAKER_NOT_MODIFIED(CONFLICT, "사용자 정보 수정에 실패했습니다."),
     CARETAKER_NOT_VALID(BAD_REQUEST, "유효하지 않은 사용자 정보입니다."),
+    CARETAKER_ALREADY_REGISTERED(CONFLICT, "이미 등록된 사용자 정보입니다"),
 
     CAREGIVER_NOT_FOUND(NOT_FOUND, "보호자 정보를 찾을 수 없습니다."),
     CAREGIVER_NOT_MATCHED(BAD_REQUEST, "보호자 정보가 일치하지 않습니다."),
@@ -46,6 +47,7 @@ public enum ErrorCode {
 
     CARETAKER_CAREGIVER_NOT_REGISTERED(CONFLICT, "이미 등록된 보호자 정보입니다"),
     CARETAKER_CAREGIVER_NOT_VALID(CONFLICT, "유효하지 않은 보호자 정보입니다"),
+    CAREGIVER_CARETAKER_NOT_MATCHED(BAD_REQUEST, "사용자 정보가 일치하지 않습니다"),
     CARETAKER_CAREGIVER_NOT_MATCHED(BAD_REQUEST, "보호자 정보가 일치하지 않습니다"),
 
 
