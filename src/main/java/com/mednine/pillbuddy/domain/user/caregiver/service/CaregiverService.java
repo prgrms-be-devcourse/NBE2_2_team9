@@ -54,14 +54,14 @@ public class CaregiverService {
                 () -> new PillBuddyCustomException(ErrorCode.CARETAKER_NOT_FOUND)
         );
 
+        if (caretakerCaregiverRepository.findByCaretakerIdAndCaregiverId(caretakerId, caregiverId).isPresent()) {
+            throw new PillBuddyCustomException(ErrorCode.CARETAKER_ALREADY_REGISTERED);
+        }
+
         CaretakerCaregiver caretakerCaregiver = CaretakerCaregiver.builder()
                 .caregiver(caregiver)
                 .caretaker(caretaker)
                 .build();
-
-        if (caretakerCaregiverRepository.findByCaretakerIdAndCaregiverId(caretakerId, caregiverId).isPresent()) {
-            throw new PillBuddyCustomException(ErrorCode.CARETAKER_ALREADY_REGISTERED);
-        }
 
         CaretakerCaregiver savedCaretakerCaregiver = caretakerCaregiverRepository.save(caretakerCaregiver);
         return CaretakerCaregiverDTO.entityToDTO(savedCaretakerCaregiver);
