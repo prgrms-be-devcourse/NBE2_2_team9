@@ -5,8 +5,6 @@ import com.mednine.pillbuddy.global.exception.ErrorResponse;
 import com.mednine.pillbuddy.global.exception.PillBuddyCustomException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -16,20 +14,21 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.web.filter.GenericFilterBean;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class JwtAuthenticationFilter extends GenericFilterBean {
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final ObjectMapper objectMapper;
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+            throws ServletException, IOException {
         try {
-            String token = jwtTokenProvider.resolveToken((HttpServletRequest) request);
+            String token = jwtTokenProvider.resolveToken(request);
 
             // token 유효성 검증
             if (token != null && jwtTokenProvider.validateToken(token)) {
@@ -39,7 +38,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
 
             chain.doFilter(request, response);
         } catch (PillBuddyCustomException e) {
-            handleException((HttpServletResponse) response, e);
+            handleException(response, e);
         }
     }
 
