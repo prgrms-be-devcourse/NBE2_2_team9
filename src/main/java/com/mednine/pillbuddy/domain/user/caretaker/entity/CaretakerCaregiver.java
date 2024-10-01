@@ -7,8 +7,8 @@ import lombok.*;
 
 @Entity
 @Table(name = "caretaker_caregiver")
-@Builder
 @Getter
+@Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CaretakerCaregiver extends BaseTimeEntity {
