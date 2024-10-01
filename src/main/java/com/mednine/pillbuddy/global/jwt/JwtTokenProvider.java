@@ -12,13 +12,11 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.HttpServletRequest;
 import java.security.Key;
 import java.util.Date;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -48,11 +46,30 @@ public class JwtTokenProvider {
         this.myUserDetailsService = myUserDetailsService;
     }
 
+    public JwtToken generateToken(Authentication authentication) {
+        Date now = new Date();
+        String accessToken = getAccessToken(authentication, now);
+        String refreshToken = getRefreshToken(authentication, now);
+
+        return JwtToken.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .grantType(GRANT_TYPE)
+                .build();
+    }
+
+    public JwtToken reissueAccessToken(String refreshToken) {
+        String loginId = getLoginId(refreshToken);
+        CustomUserDetails userDetails = myUserDetailsService.loadUserByUsername(loginId);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, "",
+                userDetails.getAuthorities());
+        return generateToken(authentication);
+    }
+
     /**
      * Access 토큰 생성
      */
-    public String getAccessToken(Authentication authentication) {
-        Date now = new Date();
+    public String getAccessToken(Authentication authentication, Date now) {
         Date accessTokenExpireDate = new Date(now.getTime() + accessExpirationTime);
 
         Claims claims = Jwts.claims();
@@ -69,8 +86,7 @@ public class JwtTokenProvider {
     /**
      * Refresh 토큰 생성
      */
-    public String getRefreshToken(Authentication authentication) {
-        Date now = new Date();
+    public String getRefreshToken(Authentication authentication, Date now) {
         Date refreshTokenExpireDate = new Date(now.getTime() + refreshExpirationTime);
 
         Claims claims = Jwts.claims();
@@ -131,10 +147,9 @@ public class JwtTokenProvider {
     }
 
     /**
-     * HttpRequest 로부터 토큰 정보를 가져오는 메서드
+     * 토큰 정보를 가져오는 메서드
      */
-    public String resolveToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
+    public String resolveToken(String bearerToken) {
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(GRANT_TYPE)
                 && bearerToken.length() > GRANT_TYPE.length() + 1) {
             return bearerToken.substring(GRANT_TYPE.length() + 1);

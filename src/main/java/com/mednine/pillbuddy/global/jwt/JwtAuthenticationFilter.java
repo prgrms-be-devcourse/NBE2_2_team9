@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,7 +29,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
         try {
-            String token = jwtTokenProvider.resolveToken(request);
+            String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
+            String token = jwtTokenProvider.resolveToken(bearerToken);
 
             // token 유효성 검증
             if (token != null && jwtTokenProvider.validateToken(token)) {

@@ -99,7 +99,7 @@ class UserServiceTest {
 
         // when
         JwtToken jwtToken = userService.login(loginDto);
-        Authentication authentication = jwtTokenProvider.getAuthentication(jwtToken.getAccessToken());
+        Authentication authentication = jwtTokenProvider.getAuthenticationByToken(jwtToken.getAccessToken());
 
         // then
         assertThat(jwtToken.getGrantType()).isEqualTo("Bearer");
