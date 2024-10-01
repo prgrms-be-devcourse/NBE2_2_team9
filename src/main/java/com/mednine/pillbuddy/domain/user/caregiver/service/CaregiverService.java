@@ -45,6 +45,7 @@ public class CaregiverService {
         return medications;
     }
 
+
     @Transactional
     public CaretakerCaregiverDTO register(Long caregiverId, Long caretakerId) {
         Caregiver caregiver = caregiverRepository.findById(caregiverId).orElseThrow(
