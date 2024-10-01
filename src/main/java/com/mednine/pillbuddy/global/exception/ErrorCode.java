@@ -2,6 +2,7 @@ package com.mednine.pillbuddy.global.exception;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CONFLICT;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
@@ -19,6 +20,13 @@ public enum ErrorCode {
     USER_ALREADY_REGISTERED_LOGIN_ID(CONFLICT, "이미 등록된 아이디입니다."),
     USER_ALREADY_REGISTERED_PHONE_NUMBER(CONFLICT, "이미 등록된 전화번호입니다."),
     USER_INVALID_TYPE(BAD_REQUEST, "유효하지 않은 사용자 유형입니다."),
+
+    PROFILE_INVALID_FILE(BAD_REQUEST, "잘못된 이미지 파일입니다."),
+    PROFILE_INVALID_FILE_TYPE(BAD_REQUEST, "이미지 파일만 업로드할 수 있습니다."),
+    PROFILE_NOT_SUPPORT_FILE_TYPE(BAD_REQUEST, "지원하지 않는 파일 형식입니다."),
+    PROFILE_BLANK_FILE_NAME(BAD_REQUEST, "파일 이름은 공백일 수 없습니다."),
+    PROFILE_DELETE_FILE_FAIL(INTERNAL_SERVER_ERROR, "업로드 디렉토리를 생성할 수 없습니다."),
+    PROFILE_CREATE_DIRECTORY_FAIL(INTERNAL_SERVER_ERROR, "파일을 삭제할 수 없습니다."),
 
     JWT_TOKEN_INVALID(UNAUTHORIZED, "유효하지 않은 JWT 토큰입니다."),
     JWT_TOKEN_EXPIRED(UNAUTHORIZED, "JWT 토큰이 만료되었습니다."),
