@@ -19,6 +19,11 @@ jwt:
     access-expiration-time: 300000 # 5분
     refresh-expiration-time: 86400000  # 24시간
 
+openApi:
+  dataType: json
+  serviceKey: #e약은요 API의 encoding된 인증키를 넣어주시면 됩니다
+  callbackUrl: http://apis.data.go.kr/1471000/DrbEasyDrugInfoService/getDrbEasyDrugList
+
 sms:
   api-key: ${API_KEY}
   api-secret-key: ${API_SECRET}
