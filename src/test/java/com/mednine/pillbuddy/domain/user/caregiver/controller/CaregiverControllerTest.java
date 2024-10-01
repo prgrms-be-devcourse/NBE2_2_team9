@@ -1,6 +1,7 @@
 package com.mednine.pillbuddy.domain.user.caregiver.controller;
 
 import com.mednine.pillbuddy.domain.user.caretaker.dto.CaretakerCaregiverDTO;
+import com.mednine.pillbuddy.domain.userMedication.dto.UserMedicationDTO;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,10 +9,24 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @SpringBootTest
 public class CaregiverControllerTest {
     @Autowired
     private CaregiverController caregiverController;
+
+    @Test
+    @Transactional
+    public void getCaretakerMedications() {
+        Long caregiverId = 1L;
+        Long caretakerId = 1L;
+
+        ResponseEntity<List<UserMedicationDTO>> userMedication = caregiverController.getCaretakerMedications(caregiverId, caretakerId);
+
+        Assertions.assertThat(userMedication).isNotNull();
+        Assertions.assertThat(userMedication.getBody()).isNotNull();
+    }
 
     @Test
     @Transactional
