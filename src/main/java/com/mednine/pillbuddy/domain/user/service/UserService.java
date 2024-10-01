@@ -1,8 +1,6 @@
 package com.mednine.pillbuddy.domain.user.service;
 
-import com.mednine.pillbuddy.domain.user.caregiver.entity.Caregiver;
 import com.mednine.pillbuddy.domain.user.caregiver.repository.CaregiverRepository;
-import com.mednine.pillbuddy.domain.user.caretaker.entity.Caretaker;
 import com.mednine.pillbuddy.domain.user.caretaker.repository.CaretakerRepository;
 import com.mednine.pillbuddy.domain.user.dto.JoinDto;
 import com.mednine.pillbuddy.domain.user.dto.LoginDto;
@@ -18,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
