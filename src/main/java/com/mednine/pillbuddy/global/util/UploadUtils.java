@@ -16,7 +16,6 @@ public class UploadUtils {
 
     private static final String FILE_NAME_REGEX = "[^a-zA-Z0-9.\\-_]";
     private static final String FILE_NAME_REPLACEMENT = "_";
-    private static final String FILE_TYPE_PREFIX = "image";
 
     @Value("${file.path}")
     private String uploadPath;
@@ -35,18 +34,6 @@ public class UploadUtils {
     }
 
     public String upload(MultipartFile file) {
-        if (file == null || file.getContentType() == null) {
-            throw new PillBuddyCustomException(ErrorCode.PROFILE_INVALID_FILE);
-        }
-
-        if (!file.getContentType().startsWith(FILE_TYPE_PREFIX)) {
-            throw new PillBuddyCustomException(ErrorCode.PROFILE_INVALID_FILE_TYPE);
-        }
-
-        if (file.getOriginalFilename() == null || file.getOriginalFilename().isBlank()) {
-            throw new PillBuddyCustomException(ErrorCode.PROFILE_BLANK_FILE_NAME);
-        }
-
         String uuid = UUID.randomUUID().toString();
         String saveFileName = uuid + FILE_NAME_REPLACEMENT + cleanFileName(file.getOriginalFilename());
 

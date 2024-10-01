@@ -4,6 +4,8 @@ import com.mednine.pillbuddy.domain.user.dto.UserType;
 import com.mednine.pillbuddy.domain.user.profile.service.uploader.CaregiverProfileUploader;
 import com.mednine.pillbuddy.domain.user.profile.service.uploader.CaretakerProfileUploader;
 import com.mednine.pillbuddy.domain.user.profile.service.uploader.ProfileUploader;
+import com.mednine.pillbuddy.global.exception.ErrorCode;
+import com.mednine.pillbuddy.global.exception.PillBuddyCustomException;
 import jakarta.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,6 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @RequiredArgsConstructor
 public class ProfileService {
+
+    private static final String FILE_TYPE_PREFIX = "image";
 
     private final CaregiverProfileUploader caregiverProfileUploader;
     private final CaretakerProfileUploader caretakerProfileUploader;
@@ -27,11 +31,26 @@ public class ProfileService {
     }
 
     public void uploadProfile(MultipartFile file, Long userId, UserType userType) {
+        validateFile(file);
         ProfileUploader uploader = uploaderMap.get(userType);
 
         if (uploader == null) {
-            throw new IllegalArgumentException("잘못된 사용자 형식입니다.");
+            throw new PillBuddyCustomException(ErrorCode.USER_INVALID_TYPE);
         }
         uploader.upload(file, userId);
+    }
+
+    private void validateFile(MultipartFile file) {
+        if (file == null || file.getContentType() == null) {
+            throw new PillBuddyCustomException(ErrorCode.PROFILE_INVALID_FILE);
+        }
+
+        if (!file.getContentType().startsWith(FILE_TYPE_PREFIX)) {
+            throw new PillBuddyCustomException(ErrorCode.PROFILE_INVALID_FILE_TYPE);
+        }
+
+        if (file.getOriginalFilename() == null || file.getOriginalFilename().isBlank()) {
+            throw new PillBuddyCustomException(ErrorCode.PROFILE_BLANK_FILE_NAME);
+        }
     }
 }

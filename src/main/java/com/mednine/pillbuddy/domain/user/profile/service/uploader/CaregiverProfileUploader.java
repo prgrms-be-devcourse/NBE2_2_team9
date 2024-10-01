@@ -40,6 +40,7 @@ public class CaregiverProfileUploader implements ProfileUploader{
                     .build();
         }
 
+        // 예외 발생 시 업로드한 파일 삭제
         try {
             Image save = imageRepository.save(image);
             caregiver.updateImage(save);
