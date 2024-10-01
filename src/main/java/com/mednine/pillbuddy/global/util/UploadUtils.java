@@ -16,7 +16,7 @@ public class UploadUtils {
 
     private static final String FILE_NAME_REGEX = "[^a-zA-Z0-9.\\-_]";
     private static final String FILE_NAME_REPLACEMENT = "_";
-    private static final String VALID_FILE_TYPE_PREFIX = "image";
+    private static final String FILE_TYPE_PREFIX = "image";
 
     @Value("${file.path}")
     private String uploadPath;
@@ -39,7 +39,7 @@ public class UploadUtils {
             throw new PillBuddyCustomException(ErrorCode.PROFILE_INVALID_FILE);
         }
 
-        if (!file.getContentType().startsWith(VALID_FILE_TYPE_PREFIX)) {
+        if (!file.getContentType().startsWith(FILE_TYPE_PREFIX)) {
             throw new PillBuddyCustomException(ErrorCode.PROFILE_INVALID_FILE_TYPE);
         }
 
