@@ -75,7 +75,7 @@ CREATE TABLE user_medication
     description        VARCHAR(100),
     dosage             INT,
     stock              INT                                                                                                   NOT NULL,
-    frequency          ENUM ('AS_NEEDED', 'BIWEEKLY', 'MONTHLY', 'ONCE_A_DAY', 'THREE_TIMES_A_DAY', 'TWICE_A_DAY', 'WEEKLY') NOT NULL,
+    frequency          ENUM ('BIWEEKLY', 'MONTHLY', 'ONCE_A_DAY', 'THREE_TIMES_A_DAY', 'TWICE_A_DAY', 'WEEKLY') NOT NULL,
     type               ENUM ('MEDICATION', 'SUPPLEMENT')                                                                     NOT NULL,
     start_date         DATETIME(6)                                                                                           NOT NULL,
     end_date           DATETIME(6)                                                                                           NOT NULL,

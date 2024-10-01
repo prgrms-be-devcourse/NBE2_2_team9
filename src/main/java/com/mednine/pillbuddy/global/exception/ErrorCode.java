@@ -53,7 +53,9 @@ public enum ErrorCode {
     CARETAKER_CAREGIVER_NOT_REGISTERED(CONFLICT, "이미 등록된 보호자 정보입니다"),
     CARETAKER_CAREGIVER_NOT_VALID(CONFLICT, "유효하지 않은 보호자 정보입니다"),
     CAREGIVER_CARETAKER_NOT_MATCHED(BAD_REQUEST, "사용자 정보가 일치하지 않습니다"),
-    CARETAKER_CAREGIVER_NOT_MATCHED(BAD_REQUEST, "보호자 정보가 일치하지 않습니다");
+    CARETAKER_CAREGIVER_NOT_MATCHED(BAD_REQUEST, "보호자 정보가 일치하지 않습니다"),
+  
+    MESSAGE_SEND_FAILED(BAD_REQUEST, "메시지 전송에 실패했습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;
