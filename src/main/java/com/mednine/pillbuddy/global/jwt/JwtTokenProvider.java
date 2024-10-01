@@ -1,5 +1,7 @@
 package com.mednine.pillbuddy.global.jwt;
 
+import com.mednine.pillbuddy.domain.user.service.CustomUserDetails;
+import com.mednine.pillbuddy.domain.user.service.MyUserDetailsService;
 import com.mednine.pillbuddy.global.exception.ErrorCode;
 import com.mednine.pillbuddy.global.exception.PillBuddyCustomException;
 import io.jsonwebtoken.Claims;
@@ -12,18 +14,13 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import java.security.Key;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -32,9 +29,10 @@ import org.springframework.util.StringUtils;
 public class JwtTokenProvider {
 
     private static final String GRANT_TYPE = "Bearer";
-    private static final String AUTHORITIES_KEY = "auth";
 
     private final Key key;
+
+    private final MyUserDetailsService myUserDetailsService;
 
     @Value("${jwt.token.access-expiration-time}")
     private Long accessExpirationTime;
@@ -42,64 +40,63 @@ public class JwtTokenProvider {
     @Value("${jwt.token.refresh-expiration-time}")
     private Long refreshExpirationTime;
 
-
-    public JwtTokenProvider(@Value("${jwt.token.client-secret}") String secretKey) {
+    @Autowired
+    public JwtTokenProvider(@Value("${jwt.token.client-secret}") String secretKey,
+                            MyUserDetailsService myUserDetailsService) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
+        this.myUserDetailsService = myUserDetailsService;
     }
 
-    // JwtToken 생성
-    public JwtToken generateToken(Authentication authentication) {
-        long now = (new Date()).getTime();
-        Date accessTokenExpireDate = new Date(now + accessExpirationTime);
-        Date refreshTokenExpireDate = new Date(now + refreshExpirationTime);
+    /**
+     * Access 토큰 생성
+     */
+    public String getAccessToken(Authentication authentication) {
+        Date now = new Date();
+        Date accessTokenExpireDate = new Date(now.getTime() + accessExpirationTime);
 
-        String accessToken = getAccessToken(authentication, accessTokenExpireDate);
-        String refreshToken = getRefreshToken(refreshTokenExpireDate);
-
-        return JwtToken.builder()
-                .grantType(GRANT_TYPE)
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
-    }
-
-    private String getAccessToken(Authentication authentication, Date accessTokenExpiresIn) {
-        String authorities = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(","));
+        Claims claims = Jwts.claims();
+        claims.setSubject(authentication.getName());
 
         return Jwts.builder()
-                .setSubject(authentication.getName())
-                .claim(AUTHORITIES_KEY, authorities)
-                .setExpiration(accessTokenExpiresIn)
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(accessTokenExpireDate)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    private String getRefreshToken(Date refreshTokenExpiresIn) {
+    /**
+     * Refresh 토큰 생성
+     */
+    public String getRefreshToken(Authentication authentication) {
+        Date now = new Date();
+        Date refreshTokenExpireDate = new Date(now.getTime() + refreshExpirationTime);
+
+        Claims claims = Jwts.claims();
+        claims.setSubject(authentication.getName());
+
         return Jwts.builder()
-                .setExpiration(refreshTokenExpiresIn)
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(refreshTokenExpireDate)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public Authentication getAuthentication(String accessToken) {
-        Claims claims = parseClaims(accessToken);
+    /**
+     * 토큰의 loginId 를 통해 권한을 가져오는 메서드
+     */
+    public Authentication getAuthenticationByToken(String token) {
+        String loginId = getLoginId(token);
+        CustomUserDetails userDetails = myUserDetailsService.loadUserByUsername(loginId);
 
-        if (claims.get(AUTHORITIES_KEY) == null) {
-            throw new PillBuddyCustomException(ErrorCode.JWT_TOKEN_INVALID);
-        }
+        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+    }
 
-        // 권한 정보 가져오기
-        Collection<? extends GrantedAuthority> authorities = Arrays.stream(
-                        claims.get(AUTHORITIES_KEY).toString().split(","))
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
-
-        // UserDetails 객체를 만들어서 Authentication return
-        UserDetails principal = new User(claims.getSubject(), "", authorities);
-        return new UsernamePasswordAuthenticationToken(principal, "", authorities);
+    private String getLoginId(String token) {
+        Claims claims = parseClaims(token);
+        return claims.getSubject();
     }
 
     private Claims parseClaims(String accessToken) {
@@ -114,7 +111,9 @@ public class JwtTokenProvider {
         }
     }
 
-    // 토큰 검증 메서드
+    /**
+     * 토큰 검증 메서드
+     */
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder()
@@ -131,10 +130,14 @@ public class JwtTokenProvider {
         }
     }
 
+    /**
+     * HttpRequest 로부터 토큰 정보를 가져오는 메서드
+     */
     public String resolveToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(GRANT_TYPE)) {
-            return bearerToken.substring(7);
+        String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(GRANT_TYPE)
+                && bearerToken.length() > GRANT_TYPE.length() + 1) {
+            return bearerToken.substring(GRANT_TYPE.length() + 1);
         }
         return null;
     }

@@ -32,14 +32,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             // token 유효성 검증
             if (token != null && jwtTokenProvider.validateToken(token)) {
-                Authentication authentication = jwtTokenProvider.getAuthentication(token);
+                // token 의 loginId 를 통해 권한 정보를 조회하여 SecurityContext 에 저장
+                Authentication authentication = jwtTokenProvider.getAuthenticationByToken(token);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
-
-            chain.doFilter(request, response);
         } catch (PillBuddyCustomException e) {
             handleException(response, e);
         }
+
+        chain.doFilter(request, response);
     }
 
     private void handleException(HttpServletResponse response, PillBuddyCustomException e) throws IOException {
