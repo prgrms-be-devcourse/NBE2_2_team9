@@ -99,7 +99,7 @@ class UserServiceTest {
 
         // when
         JwtToken jwtToken = userService.login(loginDto);
-        Authentication authentication = jwtTokenProvider.getAuthentication(jwtToken.getAccessToken());
+        Authentication authentication = jwtTokenProvider.getAuthenticationByToken(jwtToken.getAccessToken());
 
         // then
         assertThat(jwtToken.getGrantType()).isEqualTo("Bearer");
@@ -133,5 +133,46 @@ class UserServiceTest {
             userService.login(loginDto);
         }).isInstanceOf(BadCredentialsException.class)
                 .hasMessage("Bad credentials");
+    }
+
+    @Test
+    @DisplayName("사용자는 refreshToken 을 통해 토큰을 재발급 할 수 있다.")
+    void reissueToken() {
+        // given
+        LoginDto loginDto = new LoginDto("caregiver3", "password3");
+
+        JwtToken jwtToken = userService.login(loginDto);
+        String refreshToken = "Bearer " + jwtToken.getRefreshToken();
+
+        // when
+        JwtToken reissuedJwtToken = userService.reissueToken(refreshToken);
+        String reissuedAccessToken = reissuedJwtToken.getAccessToken();
+        Authentication authentication = jwtTokenProvider.getAuthenticationByToken(reissuedAccessToken);
+
+        // then
+        assertThat(authentication.getName()).isEqualTo("caregiver3");
+        assertThat(authentication.getAuthorities().iterator().next().getAuthority()).isEqualTo("ROLE_USER");
+    }
+
+    @Test
+    @DisplayName("유효하지 않은 refreshToken 이면, PillBuddyException 이 발생한다.")
+    void reissueToken_with_expired_refreshToken() {
+        // given
+        String malformedRefreshToken = "Bearer malformed_jwt_token";
+
+        assertThatThrownBy(() -> userService.reissueToken(malformedRefreshToken))
+                .isInstanceOf(PillBuddyCustomException.class)
+                .hasMessage("유효하지 않은 JWT 토큰입니다.");
+    }
+
+    @Test
+    @DisplayName("GrantType 이 없는 refreshToken 이면, PillBuddyException 이 발생한다.")
+    void reissueToken_without_grantType() {
+        // given
+        String refreshToken = "simple_refresh_token";
+
+        assertThatThrownBy(() -> userService.reissueToken(refreshToken))
+                .isInstanceOf(PillBuddyCustomException.class)
+                .hasMessage("유효하지 않은 JWT 토큰입니다.");
     }
 }

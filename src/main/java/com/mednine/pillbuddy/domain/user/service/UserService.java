@@ -1,8 +1,6 @@
 package com.mednine.pillbuddy.domain.user.service;
 
-import com.mednine.pillbuddy.domain.user.caregiver.entity.Caregiver;
 import com.mednine.pillbuddy.domain.user.caregiver.repository.CaregiverRepository;
-import com.mednine.pillbuddy.domain.user.caretaker.entity.Caretaker;
 import com.mednine.pillbuddy.domain.user.caretaker.repository.CaretakerRepository;
 import com.mednine.pillbuddy.domain.user.dto.JoinDto;
 import com.mednine.pillbuddy.domain.user.dto.LoginDto;
@@ -18,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -32,32 +31,13 @@ public class UserService {
     private final JwtTokenProvider jwtTokenProvider;
 
     public UserDto join(JoinDto joinDto) {
-        // 회원가입 유효성 검증
-        if (caregiverRepository.existsByLoginId(joinDto.getLoginId()) || caretakerRepository.existsByLoginId(
-                joinDto.getLoginId())) {
-            throw new PillBuddyCustomException(ErrorCode.USER_ALREADY_REGISTERED_LOGIN_ID);
-        }
-        if (caregiverRepository.existsByEmail(joinDto.getEmail()) || caretakerRepository.existsByEmail(
-                joinDto.getEmail())) {
-            throw new PillBuddyCustomException(ErrorCode.USER_ALREADY_REGISTERED_EMAIL);
-        }
-        if (caregiverRepository.existsByPhoneNumber(joinDto.getPhoneNumber())
-                || caretakerRepository.existsByPhoneNumber(joinDto.getPhoneNumber())) {
-            throw new PillBuddyCustomException(ErrorCode.USER_ALREADY_REGISTERED_PHONE_NUMBER);
-        }
-
+        validateJoinInfo(joinDto);
         joinDto.encodePassword(passwordEncoder);
 
         // 사용자 타입에 따라 회원 저장
         return switch (joinDto.getUserType()) {
-            case CAREGIVER -> {
-                Caregiver savedCaregiver = caregiverRepository.save(joinDto.toCaregiverEntity());
-                yield new UserDto(savedCaregiver);
-            }
-            case CARETAKER -> {
-                Caretaker savedCaretaker = caretakerRepository.save(joinDto.toCaretakerEntity());
-                yield new UserDto(savedCaretaker);
-            }
+            case CAREGIVER -> new UserDto(caregiverRepository.save(joinDto.toCaregiverEntity()));
+            case CARETAKER -> new UserDto(caretakerRepository.save(joinDto.toCaretakerEntity()));
         };
     }
 
@@ -72,6 +52,7 @@ public class UserService {
         return jwtTokenProvider.generateToken(authentication);
     }
 
+    @Transactional(propagation = Propagation.NEVER)
     public void logout() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -79,5 +60,34 @@ public class UserService {
             throw new PillBuddyCustomException(ErrorCode.USER_AUTHENTICATION_REQUIRED);
         }
         SecurityContextHolder.clearContext();
+    }
+
+    @Transactional(readOnly = true)
+    public JwtToken reissueToken(String bearerToken) {
+        // 토큰 가져오기
+        String refreshToken = jwtTokenProvider.resolveToken(bearerToken);
+
+        // 토큰 유효성 검사
+        if (refreshToken == null || !jwtTokenProvider.validateToken(refreshToken)) {
+            throw new PillBuddyCustomException(ErrorCode.JWT_TOKEN_INVALID);
+        }
+
+        return jwtTokenProvider.reissueAccessToken(refreshToken);
+    }
+
+    private void validateJoinInfo(JoinDto joinDto) {
+        // 회원가입 유효성 검증
+        if (caregiverRepository.existsByLoginId(joinDto.getLoginId()) || caretakerRepository.existsByLoginId(
+                joinDto.getLoginId())) {
+            throw new PillBuddyCustomException(ErrorCode.USER_ALREADY_REGISTERED_LOGIN_ID);
+        }
+        if (caregiverRepository.existsByEmail(joinDto.getEmail()) || caretakerRepository.existsByEmail(
+                joinDto.getEmail())) {
+            throw new PillBuddyCustomException(ErrorCode.USER_ALREADY_REGISTERED_EMAIL);
+        }
+        if (caregiverRepository.existsByPhoneNumber(joinDto.getPhoneNumber())
+                || caretakerRepository.existsByPhoneNumber(joinDto.getPhoneNumber())) {
+            throw new PillBuddyCustomException(ErrorCode.USER_ALREADY_REGISTERED_PHONE_NUMBER);
+        }
     }
 }
