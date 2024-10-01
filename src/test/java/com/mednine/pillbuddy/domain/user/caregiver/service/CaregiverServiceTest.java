@@ -2,7 +2,6 @@ package com.mednine.pillbuddy.domain.user.caregiver.service;
 
 import com.mednine.pillbuddy.domain.user.caretaker.dto.CaretakerCaregiverDTO;
 import com.mednine.pillbuddy.domain.userMedication.dto.UserMedicationDTO;
-import com.mednine.pillbuddy.domain.userMedication.service.UserMedicationService;
 import com.mednine.pillbuddy.global.exception.PillBuddyCustomException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
