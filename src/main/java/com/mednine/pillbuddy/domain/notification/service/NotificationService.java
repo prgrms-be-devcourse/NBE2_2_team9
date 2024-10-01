@@ -70,8 +70,9 @@ public class NotificationService {
     //메세지 전송
     public void sendNotifications() {
         LocalDateTime now = LocalDateTime.now();
-        List<Notification> notifications = notificationRepository.findByNotificationTime(now);
+        LocalDateTime nowPlusOneMinute = now.plusMinutes(1);
 
+        List<Notification> notifications = notificationRepository.findByNotificationTime(now, nowPlusOneMinute);
         if (notifications != null && !notifications.isEmpty()) {
             for (Notification notification : notifications) {
                 sendNotificationToCaretaker(notification);
@@ -94,16 +95,18 @@ public class NotificationService {
 
     private void sendNotificationToCaregivers(Notification notification) {
         List<CaretakerCaregiver> caretakerCaregivers = caretakerCaregiverRepository.findByCaretaker(notification.getCaretaker());
-        String medicationName = notification.getUserMedication().getName();
+        if (caretakerCaregivers != null && !caretakerCaregivers.isEmpty()) {
+            String medicationName = notification.getUserMedication().getName();
 
-        for (CaretakerCaregiver caretakerCaregiver : caretakerCaregivers) {
-            Caregiver caregiver = caretakerCaregiver.getCaregiver();
-            String caregiverPhoneNumber = caregiver.getPhoneNumber();
-            try {
-                smsProvider.sendNotification(caregiverPhoneNumber, medicationName);
-                log.info("Caregiver에게 메세지 전송 성공");
-            } catch (Exception e) {
-                throw new PillBuddyCustomException(ErrorCode.MESSAGE_SEND_FAILED);
+            for (CaretakerCaregiver caretakerCaregiver : caretakerCaregivers) {
+                Caregiver caregiver = caretakerCaregiver.getCaregiver();
+                String caregiverPhoneNumber = caregiver.getPhoneNumber();
+                try {
+                    smsProvider.sendNotification(caregiverPhoneNumber, medicationName);
+                    log.info("Caregiver에게 메세지 전송 성공");
+                } catch (Exception e) {
+                    throw new PillBuddyCustomException(ErrorCode.MESSAGE_SEND_FAILED);
+                }
             }
         }
     }
