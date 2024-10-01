@@ -50,9 +50,6 @@ public class MedicationApiService {
     public Page<MedicationDTO> findAllByName(String itemName,int pageNo,int numOfRows) {
         PageRequest pageRequest = PageRequest.of(pageNo,numOfRows, Sort.by(Sort.Direction.ASC, "itemSeq"));
         Page<Medication> allByItemNameLike = medicationApiRepository.findAllByItemNameLike(itemName,pageRequest);
-        if (allByItemNameLike.isEmpty()) {
-            return null;
-        }
         return allByItemNameLike.map(Medication::changeDTO);
     }
 

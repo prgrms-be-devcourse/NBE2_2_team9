@@ -55,7 +55,7 @@ public enum ErrorCode {
     REQUIRED_VALUE(BAD_REQUEST,"제품명은 필수입니다."),
     OUT_OF_PAGE(BAD_REQUEST,"페이지 설정이 잘못됐습니다."),
     ERROR_CONNECTION(GATEWAY_TIMEOUT,"외부 API 서버에 연결하는 중 오류가 발생했습니다."),
-    NETWORK_ERROR(SERVICE_UNAVAILABLE, "네트워크 통신 중 오류가 발생했습니다.");
+    NETWORK_ERROR(SERVICE_UNAVAILABLE, "네트워크 통신 중 오류가 발생했습니다."),
 
     MESSAGE_SEND_FAILED(BAD_REQUEST, "메시지 전송에 실패했습니다.");
 
