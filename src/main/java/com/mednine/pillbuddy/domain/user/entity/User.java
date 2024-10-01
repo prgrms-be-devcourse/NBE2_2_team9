@@ -1,5 +1,6 @@
 package com.mednine.pillbuddy.domain.user.entity;
 
+import com.mednine.pillbuddy.domain.user.profile.entity.Image;
 import com.mednine.pillbuddy.global.entity.BaseTimeEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -21,7 +22,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public abstract class User extends BaseTimeEntity {
-  
+
     @Column(name = "username", length = 30, nullable = false)
     private String username;
 
@@ -44,4 +45,8 @@ public abstract class User extends BaseTimeEntity {
     @OneToOne(cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "image_id")
     private Image image;
+
+    public void updateImage(Image image) {
+        this.image = image;
+    }
 }
