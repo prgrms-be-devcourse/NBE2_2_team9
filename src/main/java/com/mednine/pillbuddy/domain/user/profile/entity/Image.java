@@ -1,4 +1,4 @@
-package com.mednine.pillbuddy.domain.user.entity;
+package com.mednine.pillbuddy.domain.user.profile.entity;
 
 import com.mednine.pillbuddy.global.entity.BaseTimeEntity;
 import jakarta.persistence.Column;
@@ -7,9 +7,18 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "image")
+@Getter
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Image extends BaseTimeEntity {
 
     @Id

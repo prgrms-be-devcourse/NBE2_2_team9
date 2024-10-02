@@ -31,7 +31,7 @@ public class Record extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "record_id")
-    private Long caretakerId;
+    private Long id;
 
     @Column(name = "date", nullable = false)
     private LocalDateTime date;
