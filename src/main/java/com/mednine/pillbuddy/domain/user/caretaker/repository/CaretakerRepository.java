@@ -10,6 +10,4 @@ public interface CaretakerRepository extends JpaRepository<Caretaker, Long> {
     boolean existsByLoginId(String loginId);
     boolean existsByEmail(String email);
     boolean existsByPhoneNumber(String phoneNumber);
-
-
 }
