@@ -1,5 +1,6 @@
 package com.mednine.pillbuddy.domain.notification.repository;
 
+import com.mednine.pillbuddy.domain.notification.dto.UserNotificationDTO;
 import com.mednine.pillbuddy.domain.notification.entity.Notification;
 import com.mednine.pillbuddy.domain.user.caretaker.entity.Caretaker;
 import com.mednine.pillbuddy.domain.user.caretaker.repository.CaretakerRepository;
@@ -28,14 +29,15 @@ class NotificationRepositoryTest {
     private UserMedication userMedication;
     private Notification notification1;
     private LocalDateTime currentTime;
+    private Caretaker caretaker;
 
     @BeforeEach
     public void setUp() {
         currentTime = LocalDateTime.now();
 
-        // Caretaker 객체 생성
-        Caretaker caretaker = Caretaker.builder()
-                .username("caretaker")
+        // Caretaker 객체 초기화
+        caretaker = Caretaker.builder()
+                .username("testCaretaker")
                 .phoneNumber("01012345678")
                 .loginId("caretaker_login")
                 .password("caretaker_password")
@@ -105,5 +107,22 @@ class NotificationRepositoryTest {
 
         // then
         assertThat(notifications).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("특정 Caretaker에 대한 알림을 찾을 수 있어야 한다.")
+    public void findByCaretaker() {
+        //given
+        Long caretakerId = caretaker.getId();
+        String medicationName = userMedication.getName();
+
+        // when
+        List<UserNotificationDTO> notifications = notificationRepository.findByCaretaker(caretaker);
+
+        // then
+        assertThat(notifications).isNotEmpty();
+        assertThat(notifications.get(0).getCaretakerId()).isEqualTo(caretakerId);
+        assertThat(notifications.get(0).getMedicationName()).isEqualTo(medicationName);
+
     }
 }

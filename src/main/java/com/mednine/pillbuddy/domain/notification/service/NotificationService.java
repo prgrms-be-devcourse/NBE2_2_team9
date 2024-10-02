@@ -1,12 +1,15 @@
 package com.mednine.pillbuddy.domain.notification.service;
 
 import com.mednine.pillbuddy.domain.notification.dto.NotificationDTO;
+import com.mednine.pillbuddy.domain.notification.dto.UserNotificationDTO;
 import com.mednine.pillbuddy.domain.notification.entity.Notification;
 import com.mednine.pillbuddy.domain.notification.provider.SmsProvider;
 import com.mednine.pillbuddy.domain.notification.repository.NotificationRepository;
 import com.mednine.pillbuddy.domain.user.caregiver.entity.Caregiver;
+import com.mednine.pillbuddy.domain.user.caretaker.entity.Caretaker;
 import com.mednine.pillbuddy.domain.user.caretaker.entity.CaretakerCaregiver;
 import com.mednine.pillbuddy.domain.user.caretaker.repository.CaretakerCaregiverRepository;
+import com.mednine.pillbuddy.domain.user.caretaker.repository.CaretakerRepository;
 import com.mednine.pillbuddy.domain.userMedication.entity.Frequency;
 import com.mednine.pillbuddy.domain.userMedication.entity.UserMedication;
 import com.mednine.pillbuddy.domain.userMedication.repository.UserMedicationRepository;
@@ -31,6 +34,7 @@ public class NotificationService {
     private final UserMedicationRepository userMedicationRepository;
     private final CaretakerCaregiverRepository caretakerCaregiverRepository;
     private final SmsProvider smsProvider;
+    private final CaretakerRepository caretakerRepository;
 
     //알림 생성
     public List<NotificationDTO> createNotifications(Long userMedicationId) {
@@ -109,5 +113,18 @@ public class NotificationService {
                 }
             }
         }
+    }
+
+    //알림 조회
+    public List<UserNotificationDTO> findNotification(Long caretakerId) {
+        Caretaker caretaker = caretakerRepository.findById(caretakerId)
+                .orElseThrow(() -> new PillBuddyCustomException(ErrorCode.CARETAKER_NOT_FOUND));
+
+        List<UserNotificationDTO> userNotificationDTOS = notificationRepository.findByCaretaker(caretaker);
+        if (userNotificationDTOS.isEmpty()) {
+            throw new PillBuddyCustomException(ErrorCode.NOTIFICATION_NOT_FOUND);
+        }
+
+        return userNotificationDTOS;
     }
 }

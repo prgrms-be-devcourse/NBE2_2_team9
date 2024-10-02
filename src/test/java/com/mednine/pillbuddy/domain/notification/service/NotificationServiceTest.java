@@ -1,6 +1,7 @@
 package com.mednine.pillbuddy.domain.notification.service;
 
 import com.mednine.pillbuddy.domain.notification.dto.NotificationDTO;
+import com.mednine.pillbuddy.domain.notification.dto.UserNotificationDTO;
 import com.mednine.pillbuddy.domain.notification.entity.Notification;
 import com.mednine.pillbuddy.domain.notification.provider.SmsProvider;
 import com.mednine.pillbuddy.domain.notification.repository.NotificationRepository;
@@ -8,6 +9,7 @@ import com.mednine.pillbuddy.domain.user.caregiver.entity.Caregiver;
 import com.mednine.pillbuddy.domain.user.caretaker.entity.Caretaker;
 import com.mednine.pillbuddy.domain.user.caretaker.entity.CaretakerCaregiver;
 import com.mednine.pillbuddy.domain.user.caretaker.repository.CaretakerCaregiverRepository;
+import com.mednine.pillbuddy.domain.user.caretaker.repository.CaretakerRepository;
 import com.mednine.pillbuddy.domain.user.entity.Role;
 import com.mednine.pillbuddy.domain.userMedication.entity.Frequency;
 import com.mednine.pillbuddy.domain.userMedication.entity.UserMedication;
@@ -26,11 +28,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.*;
@@ -52,16 +52,21 @@ class NotificationServiceTest {
     private CaretakerCaregiverRepository caretakerCaregiverRepository;
 
     @Mock
+    private CaretakerRepository caretakerRepository;
+
+    @Mock
     private SmsProvider smsProvider;
 
     private UserMedication userMedication;
     private Notification notification;
     private CaretakerCaregiver caretakerCaregiver;
+    private Caretaker caretaker;
 
     @BeforeEach
     public void setUp() {
-        // Caretaker 객체 생성
-        Caretaker caretaker = Caretaker.builder()
+        // Caretaker 객체 초기화
+        caretaker = Caretaker.builder()
+                .id(1L)
                 .username("caretaker")
                 .phoneNumber("01012345678")
                 .role(Role.USER)
@@ -218,4 +223,60 @@ class NotificationServiceTest {
             }
         }
     }
-}
+
+    @Nested
+    @DisplayName("알림 조회 관련 테스트")
+    class FindNotificationTests {
+        @Test
+        @DisplayName("Caretaker ID로 알림을 조회할 수 있어야 한다.")
+        public void findNotification() {
+            // given
+            Long caretakerId = caretaker.getId();
+
+            // Mocking
+            when(caretakerRepository.findById(caretakerId)).thenReturn(Optional.of(caretaker));
+            when(notificationRepository.findByCaretaker(caretaker)).thenReturn(List.of(new UserNotificationDTO(notification)));
+
+            // when
+            List<UserNotificationDTO> notifications = notificationService.findNotification(caretakerId);
+
+            // then
+            assertThat(notifications).isNotEmpty();
+            assertThat(notifications).hasSize(1);
+            assertThat(notifications.get(0).getNotificationTime()).isEqualTo(notification.getNotificationTime());
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 Caretaker ID로 알림을 조회할 경우 예외가 발생해야 한다.")
+        public void findNotification_CaretakerNotFound() {
+            // given
+            Long caretakerId = 100L;
+
+            // Mocking
+            when(caretakerRepository.findById(caretakerId)).thenReturn(Optional.empty());
+
+            // when & then
+            PillBuddyCustomException exception = assertThrows(PillBuddyCustomException.class, () -> {
+                notificationService.findNotification(caretakerId);
+            });
+            assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.CARETAKER_NOT_FOUND);
+        }
+
+        @Test
+        @DisplayName("Caretaker에 대한 알림이 없을 경우 예외가 발생해야 한다.")
+        public void findNotification_NoNotificationsFound() {
+            // given
+            Long caretakerId = caretaker.getId();
+
+            // Mocking
+            when(caretakerRepository.findById(caretakerId)).thenReturn(Optional.of(caretaker));
+            when(notificationRepository.findByCaretaker(caretaker)).thenReturn(new ArrayList<>());
+
+            // when & then
+            PillBuddyCustomException exception = assertThrows(PillBuddyCustomException.class, () -> {
+                notificationService.findNotification(caretakerId);
+            });
+            assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.NOTIFICATION_NOT_FOUND);
+        }
+    }
+    }

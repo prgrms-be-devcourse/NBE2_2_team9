@@ -64,7 +64,8 @@ public enum ErrorCode {
     ERROR_CONNECTION(GATEWAY_TIMEOUT,"외부 API 서버에 연결하는 중 오류가 발생했습니다."),
     NETWORK_ERROR(SERVICE_UNAVAILABLE, "네트워크 통신 중 오류가 발생했습니다."),
 
-    MESSAGE_SEND_FAILED(BAD_REQUEST, "메시지 전송에 실패했습니다.");
+    MESSAGE_SEND_FAILED(BAD_REQUEST, "메시지 전송에 실패했습니다."),
+    NOTIFICATION_NOT_FOUND(NOT_FOUND, "알람 정보를 찾을 수 없습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;
