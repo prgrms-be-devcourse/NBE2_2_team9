@@ -2,86 +2,97 @@ package com.mednine.pillbuddy.domain.user.profile.service.uploader;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import com.mednine.pillbuddy.domain.user.caretaker.entity.Caretaker;
 import com.mednine.pillbuddy.domain.user.caretaker.repository.CaretakerRepository;
+import com.mednine.pillbuddy.domain.user.entity.Role;
 import com.mednine.pillbuddy.domain.user.profile.entity.Image;
 import com.mednine.pillbuddy.domain.user.profile.repository.ImageRepository;
 import com.mednine.pillbuddy.global.exception.PillBuddyCustomException;
 import com.mednine.pillbuddy.global.util.UploadUtils;
-import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-class CaretakerProfileUploaderTest {
+@SpringBootTest
+@Transactional
+public class CaretakerProfileUploaderTest {
 
-    @InjectMocks
+    @Autowired
     private CaretakerProfileUploader caretakerProfileUploader;
 
-    @Mock
+    @Autowired
     private CaretakerRepository caretakerRepository;
 
-    @Mock
+    @Autowired
     private ImageRepository imageRepository;
 
-    @Mock
+    @Autowired
     private UploadUtils uploadUtils;
 
-    private Caretaker caretaker;
+    private String uploadedImageUrl;
 
-    private Image image;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-
-        caretaker = Caretaker.builder()
-                .id(1L)
-                .image(null)
-                .build();
-
-        image = Image.builder()
-                .id(1L)
-                .url("uploaded/test.jpg")
-                .build();
+    @AfterEach
+    void cleanUp() {
+        // 테스트가 완료되면 업로드된 이미지 삭제
+        if (uploadedImageUrl != null) {
+            uploadUtils.deleteFile(uploadedImageUrl);
+        }
     }
 
     @Test
     @DisplayName("사용자의 프로필 이미지를 업로드 할 수 있다.")
-    void upload() {
-        // Given
-        MockMultipartFile file = new MockMultipartFile("file", "test.jpg", "image/jpeg",
-                "test image content".getBytes());
-        when(caretakerRepository.findById(1L)).thenReturn(Optional.of(caretaker));
-        when(uploadUtils.upload(file)).thenReturn("uploaded/test.jpg");
-        when(imageRepository.save(any(Image.class))).thenReturn(image);
+    void test() {
+        // given
+        Caretaker caretaker = createCaretaker();
+        Long caretakerId = caretaker.getId();
 
-        // When
-        caretakerProfileUploader.upload(file, 1L);
+        MultipartFile file = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test image content".getBytes());
 
-        // Then
-        assertThat(caretaker.getImage()).isEqualTo(image);
-        assertThat(caretaker.getImage().getUrl()).isEqualTo("uploaded/test.jpg");
-        verify(imageRepository).save(any(Image.class));
+        // when
+        caretakerProfileUploader.upload(file, caretakerId);
+        Caretaker uploadedProfileUser = caretakerRepository.findById(caretakerId).get();
+        Image savedImage = imageRepository.findById(uploadedProfileUser.getImage().getId()).get();
+        Image uploadedImage = uploadedProfileUser.getImage();
+
+        uploadedImageUrl = savedImage.getUrl(); // 삭제를 위해 추가
+
+        // then
+        assertThat(savedImage).isEqualTo(uploadedImage);
+
+        assertThat(savedImage).isNotNull();
+        assertThat(savedImage.getUrl()).endsWith("test.jpg");
+
+        assertThat(uploadedImage).isNotNull();
+        assertThat(uploadedImage.getUrl()).endsWith("test.jpg");
     }
 
     @Test
     @DisplayName("사용자가 존재하지 않다면 PillBuddyException 이 발생한다.")
     void upload_with_exception() {
-        MockMultipartFile file = new MockMultipartFile("file", "test.jpg", "image/jpeg",
-                "test image content".getBytes());
-        when(caretakerRepository.findById(1L)).thenReturn(Optional.empty());
+        Long userId = 99999999L;
+        MockMultipartFile file = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test image content".getBytes());
 
-        assertThatThrownBy(() -> caretakerProfileUploader.upload(file, 1L))
+        assertThatThrownBy(() -> caretakerProfileUploader.upload(file, userId))
                 .isInstanceOf(PillBuddyCustomException.class)
                 .hasMessage("회원 정보를 찾을 수 없습니다.");
+    }
+
+    private Caretaker createCaretaker() {
+        Caretaker caretaker = Caretaker.builder()
+                .username("test-caretaker")
+                .loginId("test-loginId")
+                .password("test-password")
+                .email("test-email")
+                .phoneNumber("test-phoneNumber")
+                .role(Role.USER)
+                .build();
+
+        return caretakerRepository.save(caretaker);
     }
 }
