@@ -1,6 +1,7 @@
 package com.mednine.pillbuddy.domain.user.profile.service;
 
 import com.mednine.pillbuddy.domain.user.dto.UserType;
+import com.mednine.pillbuddy.domain.user.profile.dto.ProfileUploadDto;
 import com.mednine.pillbuddy.domain.user.profile.service.uploader.CaregiverProfileUploader;
 import com.mednine.pillbuddy.domain.user.profile.service.uploader.CaretakerProfileUploader;
 import com.mednine.pillbuddy.domain.user.profile.service.uploader.ProfileUploader;
@@ -30,7 +31,10 @@ public class ProfileService {
         uploaderMap.put(UserType.CARETAKER, caretakerProfileUploader);
     }
 
-    public void uploadProfile(MultipartFile file, Long userId, UserType userType) {
+    public void uploadProfile(Long userId, ProfileUploadDto profileUploadDto) {
+        MultipartFile file = profileUploadDto.getFile();
+        UserType userType = profileUploadDto.getUserType();
+
         validateFile(file);
         ProfileUploader uploader = uploaderMap.get(userType);
 
@@ -41,7 +45,7 @@ public class ProfileService {
     }
 
     private void validateFile(MultipartFile file) {
-        if (file == null || file.getContentType() == null) {
+        if (file == null) {
             throw new PillBuddyCustomException(ErrorCode.PROFILE_INVALID_FILE);
         }
 
