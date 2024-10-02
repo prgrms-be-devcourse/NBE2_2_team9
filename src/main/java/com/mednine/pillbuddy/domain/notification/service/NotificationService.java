@@ -34,7 +34,7 @@ public class NotificationService {
     private final UserMedicationRepository userMedicationRepository;
     private final CaretakerCaregiverRepository caretakerCaregiverRepository;
     private final SmsProvider smsProvider;
-    private CaretakerRepository care;
+    private final CaretakerRepository caretakerRepository;
 
     //알림 생성
     public List<NotificationDTO> createNotifications(Long userMedicationId) {
@@ -117,7 +117,7 @@ public class NotificationService {
 
     //알림 조회
     public List<UserNotificationDTO> findNotification(Long caretakerId) {
-        Caretaker caretaker = care.findById(caretakerId)
+        Caretaker caretaker = caretakerRepository.findById(caretakerId)
                 .orElseThrow(() -> new PillBuddyCustomException(ErrorCode.CARETAKER_NOT_FOUND));
 
         List<UserNotificationDTO> userNotificationDTOS = notificationRepository.findByCaretaker(caretaker);
