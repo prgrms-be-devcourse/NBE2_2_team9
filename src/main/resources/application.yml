@@ -15,7 +15,7 @@ logging:
 
 jwt:
   token:
-    client-secret: e15f6da6387aed17fc517949bf26ac808dc81446ab913e0a51468025b8c9344e
+    client-secret: ${JWT_SECRET_KEY}
     access-expiration-time: 300000 # 5분
     refresh-expiration-time: 86400000  # 24시간
 
