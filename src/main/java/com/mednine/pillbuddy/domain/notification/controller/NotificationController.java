@@ -1,15 +1,13 @@
 package com.mednine.pillbuddy.domain.notification.controller;
 
 import com.mednine.pillbuddy.domain.notification.dto.NotificationDTO;
+import com.mednine.pillbuddy.domain.notification.dto.UserNotificationDTO;
 import com.mednine.pillbuddy.domain.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -29,5 +27,10 @@ public class NotificationController {
     @Scheduled(cron = "0 0 4 * * ?")
     public void checkAndSendNotifications() {
         notificationService.sendNotifications();
+    }
+
+    @GetMapping("/user/{caretakerId}")
+    public ResponseEntity<List<UserNotificationDTO>> findNotifications(@PathVariable Long caretakerId) {
+        return ResponseEntity.ok(notificationService.findNotification(caretakerId));
     }
 }
