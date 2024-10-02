@@ -25,7 +25,7 @@ public class ProfileService {
     private final Map<UserType, ProfileUploader> uploaderMap = new HashMap<>();
 
     @PostConstruct
-    public void initUploaderMap() {
+    private void initUploaderMap() {
         uploaderMap.put(UserType.CAREGIVER, caregiverProfileUploader);
         uploaderMap.put(UserType.CARETAKER, caretakerProfileUploader);
     }

@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Component
 @RequiredArgsConstructor
 @Transactional
-public class CaregiverProfileUploader implements ProfileUploader{
+public class CaregiverProfileUploader implements ProfileUploader {
 
     private final CaregiverRepository caregiverRepository;
     private final ImageRepository imageRepository;
