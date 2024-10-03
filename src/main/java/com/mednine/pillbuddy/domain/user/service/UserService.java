@@ -103,11 +103,13 @@ public class UserService {
         return users.stream().map(UserDto::new).toList();
     }
 
+    @Transactional(readOnly = true)
     public List<UserDto> findAllCaretaker() {
         List<Caretaker> caretakers = caretakerRepository.findAll();
         return caretakers.stream().map(UserDto::new).toList();
     }
 
+    @Transactional(readOnly = true)
     public List<UserDto> findAllCaregiver() {
         List<Caregiver> caregivers = caregiverRepository.findAll();
         return caregivers.stream().map(UserDto::new).toList();
