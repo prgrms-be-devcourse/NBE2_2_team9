@@ -1,15 +1,20 @@
 package com.mednine.pillbuddy.domain.user.service;
 
+import com.mednine.pillbuddy.domain.user.caregiver.entity.Caregiver;
 import com.mednine.pillbuddy.domain.user.caregiver.repository.CaregiverRepository;
+import com.mednine.pillbuddy.domain.user.caretaker.entity.Caretaker;
 import com.mednine.pillbuddy.domain.user.caretaker.repository.CaretakerRepository;
 import com.mednine.pillbuddy.domain.user.dto.JoinDto;
 import com.mednine.pillbuddy.domain.user.dto.LoginDto;
 import com.mednine.pillbuddy.domain.user.dto.UserDto;
 import com.mednine.pillbuddy.domain.user.dto.UserType;
+import com.mednine.pillbuddy.domain.user.entity.User;
 import com.mednine.pillbuddy.global.exception.ErrorCode;
 import com.mednine.pillbuddy.global.exception.PillBuddyCustomException;
 import com.mednine.pillbuddy.global.jwt.JwtToken;
 import com.mednine.pillbuddy.global.jwt.JwtTokenProvider;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -83,6 +88,19 @@ public class UserService {
             case CARETAKER -> new UserDto(caretakerRepository.findById(userId)
                     .orElseThrow(() -> new PillBuddyCustomException(ErrorCode.USER_NOT_FOUND)));
         };
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserDto> findAllUser() {
+        List<Caretaker> caretakers = caretakerRepository.findAll();
+        List<Caregiver> caregivers = caregiverRepository.findAll();
+
+        List<User> users = new ArrayList<>();
+
+        users.addAll(caretakers);
+        users.addAll(caregivers);
+
+        return users.stream().map(UserDto::new).toList();
     }
 
     private void validateJoinInfo(JoinDto joinDto) {

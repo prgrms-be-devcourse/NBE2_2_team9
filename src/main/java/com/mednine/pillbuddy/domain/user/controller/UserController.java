@@ -6,6 +6,7 @@ import com.mednine.pillbuddy.domain.user.dto.UserDto;
 import com.mednine.pillbuddy.domain.user.dto.UserType;
 import com.mednine.pillbuddy.domain.user.service.UserService;
 import com.mednine.pillbuddy.global.jwt.JwtToken;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -58,5 +59,13 @@ public class UserController {
         UserDto userDto = userService.findUser(userId, userType);
 
         return ResponseEntity.ok(userDto);
+    }
+
+//    @PreAuthorize("hasRole('ROEL_ADMIN')")
+    @GetMapping
+    public ResponseEntity<List<UserDto>> findAllUserInfo() {
+        List<UserDto> userDtoList = userService.findAllUser();
+
+        return ResponseEntity.ok(userDtoList);
     }
 }
