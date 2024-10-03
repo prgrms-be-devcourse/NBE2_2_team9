@@ -44,7 +44,7 @@ class UserServiceTest {
         assertThat(userDto.getUsername()).isEqualTo("newUser");
         assertThat(userDto.getPhoneNumber()).isEqualTo("010-1112-2221");
         assertThat(userDto.getEmail()).isEqualTo("new@gmail.com");
-        assertThat(userDto.getUserType()).isEqualTo("Caretaker");
+        assertThat(userDto.getUserType()).isEqualTo("caretaker");
     }
 
     @Test
