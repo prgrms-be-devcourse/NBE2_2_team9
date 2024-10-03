@@ -68,4 +68,20 @@ public class UserController {
 
         return ResponseEntity.ok(userDtoList);
     }
+
+//    @PreAuthorize("hasRole('ROEL_ADMIN')")
+    @GetMapping("/caretakers")
+    public ResponseEntity<List<UserDto>> findAllCaretakerInfo() {
+        List<UserDto> userDtoList = userService.findAllCaretaker();
+
+        return ResponseEntity.ok(userDtoList);
+    }
+
+//    @PreAuthorize("hasRole('ROEL_ADMIN')")
+    @GetMapping("/caregivers")
+    public ResponseEntity<List<UserDto>> findAllCaregiverInfo() {
+        List<UserDto> userDtoList = userService.findAllCaregiver();
+
+        return ResponseEntity.ok(userDtoList);
+    }
 }

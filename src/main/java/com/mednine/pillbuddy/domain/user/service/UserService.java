@@ -103,6 +103,16 @@ public class UserService {
         return users.stream().map(UserDto::new).toList();
     }
 
+    public List<UserDto> findAllCaretaker() {
+        List<Caretaker> caretakers = caretakerRepository.findAll();
+        return caretakers.stream().map(UserDto::new).toList();
+    }
+
+    public List<UserDto> findAllCaregiver() {
+        List<Caregiver> caregivers = caregiverRepository.findAll();
+        return caregivers.stream().map(UserDto::new).toList();
+    }
+
     private void validateJoinInfo(JoinDto joinDto) {
         if (caregiverRepository.existsByLoginId(joinDto.getLoginId()) || caretakerRepository.existsByLoginId(joinDto.getLoginId())) {
             throw new PillBuddyCustomException(ErrorCode.USER_ALREADY_REGISTERED_LOGIN_ID);
