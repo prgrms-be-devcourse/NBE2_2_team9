@@ -134,11 +134,11 @@ public class NotificationService {
         List<UserMedication> userMedications = userMedicationRepository.findAll();
 
         for (UserMedication userMedication : userMedications) {
-            checkNotificationsForUserMedication(userMedication, now);
+            checkRecords(userMedication, now);
         }
     }
 
-    private void checkNotificationsForUserMedication(UserMedication userMedication, LocalDateTime now) {
+    private void checkRecords(UserMedication userMedication, LocalDateTime now) {
         List<Notification> notifications = userMedication.getNotificationList();
         List<Record> records = recordRepository.findByUserMedication(userMedication);
 
