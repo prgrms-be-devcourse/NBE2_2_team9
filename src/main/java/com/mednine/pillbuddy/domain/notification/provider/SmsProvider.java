@@ -22,11 +22,21 @@ public class SmsProvider {
     }
     @Value("${sms.from-number}") String FROM;
 
-    public void sendNotification(String phoneNumber, String medicationName) {
+    public void sendNotification(String phoneNumber, String medicationName, String userName) {
         Message message = new Message();
         message.setFrom(FROM);
         message.setTo(phoneNumber);
-        message.setText("약 복용 시간입니다: " + medicationName);
+        message.setText(userName + "님 약 복용 시간입니다: " + medicationName);
+
+        SingleMessageSentResponse response = messageService.sendOne(new SingleMessageSendingRequest(message));
+        System.out.println("메세지 전송 성공: " + response);
+    }
+
+    public void sendCheckNotification(String phoneNumber, String medicationName, String userName) {
+        Message message = new Message();
+        message.setFrom(FROM);
+        message.setTo(phoneNumber);
+        message.setText(userName + "님이 " + medicationName + "을(를) 복용하지 않았습니다.");
 
         SingleMessageSentResponse response = messageService.sendOne(new SingleMessageSendingRequest(message));
         System.out.println("메세지 전송 성공: " + response);
