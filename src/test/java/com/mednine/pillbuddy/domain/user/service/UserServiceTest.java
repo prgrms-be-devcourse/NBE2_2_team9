@@ -16,7 +16,6 @@ import com.mednine.pillbuddy.global.exception.ErrorCode;
 import com.mednine.pillbuddy.global.exception.PillBuddyCustomException;
 import com.mednine.pillbuddy.global.jwt.JwtToken;
 import com.mednine.pillbuddy.global.jwt.JwtTokenProvider;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -256,63 +255,6 @@ class UserServiceTest {
         assertThatThrownBy(() -> userService.findUser(userId, userType))
                 .isExactlyInstanceOf(PillBuddyCustomException.class)
                 .hasMessage(ErrorCode.USER_NOT_FOUND.getMessage());
-    }
-
-    @Test
-    @DisplayName("모든 회원을 조회할 수 있다.")
-    void findAllUser() {
-        List<UserDto> userDtoList = userService.findAllUser();
-
-        assertThat(userDtoList).isNotEmpty();
-
-        // 사용자와 보호자 각각의 정보가 올바르게 반환되는지 확인
-        UserDto caretakerDto = userDtoList.stream()
-                .filter(dto -> dto.getUsername().equals("test-caretaker"))
-                .findFirst()
-                .orElseThrow();
-        assertThat(caretakerDto.getUsername()).isEqualTo(caretaker.getUsername());
-        assertThat(caretakerDto.getPhoneNumber()).isEqualTo(caretaker.getPhoneNumber());
-        assertThat(caretakerDto.getEmail()).isEqualTo(caretaker.getEmail());
-
-        UserDto caregiverDto = userDtoList.stream()
-                .filter(dto -> dto.getUsername().equals("test-caregiver"))
-                .findFirst()
-                .orElseThrow();
-        assertThat(caregiverDto.getUsername()).isEqualTo(caregiver.getUsername());
-        assertThat(caregiverDto.getPhoneNumber()).isEqualTo(caregiver.getPhoneNumber());
-        assertThat(caregiverDto.getEmail()).isEqualTo(caregiver.getEmail());
-    }
-
-    @Test
-    @DisplayName("모든 사용자를 조회할 수 있다.")
-    void findAllCaretaker() {
-        List<UserDto> userDtoList = userService.findAllCaretaker();
-
-        assertThat(userDtoList).isNotEmpty();
-
-        UserDto caretakerDto = userDtoList.stream()
-                .filter(dto -> dto.getUsername().equals("test-caretaker"))
-                .findFirst()
-                .orElseThrow();
-        assertThat(caretakerDto.getUsername()).isEqualTo(caretaker.getUsername());
-        assertThat(caretakerDto.getPhoneNumber()).isEqualTo(caretaker.getPhoneNumber());
-        assertThat(caretakerDto.getEmail()).isEqualTo(caretaker.getEmail());
-    }
-
-    @Test
-    @DisplayName("모든 보호자를 조회할 수 있다.")
-    void findAllCaregiver() {
-        List<UserDto> userDtoList = userService.findAllCaregiver();
-
-        assertThat(userDtoList).isNotEmpty();
-
-        UserDto caregiverDto = userDtoList.stream()
-                .filter(dto -> dto.getUsername().equals("test-caregiver"))
-                .findFirst()
-                .orElseThrow();
-        assertThat(caregiverDto.getUsername()).isEqualTo(caregiver.getUsername());
-        assertThat(caregiverDto.getPhoneNumber()).isEqualTo(caregiver.getPhoneNumber());
-        assertThat(caregiverDto.getEmail()).isEqualTo(caregiver.getEmail());
     }
 
     private void createCaretaker() {
