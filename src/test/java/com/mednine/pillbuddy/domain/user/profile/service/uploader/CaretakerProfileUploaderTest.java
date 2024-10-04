@@ -32,16 +32,13 @@ public class CaretakerProfileUploaderTest {
     @Autowired
     private ImageRepository imageRepository;
 
-    @Autowired
-    private UploadUtils uploadUtils;
-
     private String uploadedImageUrl;
 
     @AfterEach
     void cleanUp() {
         // 테스트가 완료되면 업로드된 이미지 삭제
         if (uploadedImageUrl != null) {
-            uploadUtils.deleteFile(uploadedImageUrl);
+            UploadUtils.deleteFile(uploadedImageUrl);
         }
     }
 

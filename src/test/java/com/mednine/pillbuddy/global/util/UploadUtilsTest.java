@@ -66,7 +66,7 @@ public class UploadUtilsTest {
         File uploadedFile = new File(tempDir.toFile(), savedFileName);
 
         // When
-        uploadUtils.deleteFile(savedFileName);
+        UploadUtils.deleteFile(savedFileName);
 
         // Then
         assertThat(uploadedFile.exists()).isFalse();

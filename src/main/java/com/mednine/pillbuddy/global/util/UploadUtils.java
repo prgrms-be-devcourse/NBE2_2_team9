@@ -51,7 +51,7 @@ public class UploadUtils {
         return fileName.replaceAll(FILE_NAME_REGEX, FILE_NAME_REPLACEMENT);
     }
 
-    public void deleteFile(String filePath) {
+    public static void deleteFile(String filePath) {
         File file = new File(filePath);
 
         if (file.exists() && !file.delete()) {
