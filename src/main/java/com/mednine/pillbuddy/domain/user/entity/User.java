@@ -46,6 +46,22 @@ public abstract class User extends BaseTimeEntity {
     @JoinColumn(name = "image_id")
     private Image image;
 
+    public void updateLoginId(String loginId) {
+        this.loginId = loginId;
+    }
+
+    public void updatePassword(String password) {
+        this.password = password;
+    }
+
+    public void updatePhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public void updateEmail(String email) {
+        this.email = email;
+    }
+
     public void updateImage(Image image) {
         this.image = image;
     }
