@@ -11,6 +11,4 @@ public class MedicationForm {
     private String itemName;
 
     private String itemSeq;
-
-
 }
