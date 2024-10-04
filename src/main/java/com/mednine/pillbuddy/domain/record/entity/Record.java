@@ -2,23 +2,10 @@ package com.mednine.pillbuddy.domain.record.entity;
 
 import com.mednine.pillbuddy.domain.userMedication.entity.UserMedication;
 import com.mednine.pillbuddy.global.entity.BaseTimeEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import lombok.*;
+
 import java.time.LocalDateTime;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "record")
@@ -38,7 +25,7 @@ public class Record extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "taken", nullable = false)
-    private Taken taken;
+    private Taken taken = Taken.UNTAKEN; // 생성 시, 기본 값을 UNTAKEN으로 성정
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_medication_id")
@@ -47,5 +34,9 @@ public class Record extends BaseTimeEntity {
     public void changeUserMedication(UserMedication userMedication) {
         this.userMedication = userMedication;
         userMedication.getRecords().add(this);
+    }
+
+    public void takeMedication(Taken taken) {
+        this.taken = taken;
     }
 }
