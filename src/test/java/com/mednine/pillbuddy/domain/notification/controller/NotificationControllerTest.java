@@ -1,15 +1,10 @@
 package com.mednine.pillbuddy.domain.notification.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mednine.pillbuddy.domain.medicationApi.repository.MedicationApiRepository;
-import com.mednine.pillbuddy.domain.medicationApi.service.MedicationApiService;
-import com.mednine.pillbuddy.domain.notification.dto.UserNotificationDTO;
 import com.mednine.pillbuddy.domain.notification.provider.SmsProvider;
 import com.mednine.pillbuddy.domain.notification.repository.NotificationRepository;
 import com.mednine.pillbuddy.domain.notification.service.NotificationService;
 import com.mednine.pillbuddy.domain.user.caretaker.repository.CaretakerCaregiverRepository;
 import com.mednine.pillbuddy.domain.user.caretaker.repository.CaretakerRepository;
-import com.mednine.pillbuddy.domain.userMedication.entity.Frequency;
 import com.mednine.pillbuddy.domain.userMedication.repository.UserMedicationRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,13 +13,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -57,7 +47,7 @@ class NotificationControllerTest {
 
     private static final String BASE_URL = "/api/notification";
 
-/*    @Test
+    @Test
     @DisplayName("알림 생성 테스트")
     void createNotifications_test() throws Exception {
         // given
@@ -83,5 +73,5 @@ class NotificationControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("[]"));
-    }*/
+    }
 }
