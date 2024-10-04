@@ -16,7 +16,6 @@ import com.mednine.pillbuddy.global.exception.ErrorCode;
 import com.mednine.pillbuddy.global.exception.PillBuddyCustomException;
 import com.mednine.pillbuddy.global.jwt.JwtToken;
 import com.mednine.pillbuddy.global.jwt.JwtTokenProvider;
-import com.mednine.pillbuddy.global.util.UploadUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -95,6 +94,7 @@ public class UserService {
 
         validateUserInfo(userUpdateDto.getLoginId(), userUpdateDto.getEmail(), userUpdateDto.getPhoneNumber());
 
+        user.updateUsername(userUpdateDto.getUsername());
         user.updateLoginId(userUpdateDto.getLoginId());
         user.updateEmail(userUpdateDto.getEmail());
         user.updatePhoneNumber(userUpdateDto.getPhoneNumber());
@@ -115,6 +115,7 @@ public class UserService {
 
     public void deleteUser(Long userId, UserType userType) {
         User user = findUserByIdAndUserType(userId, userType);
+
         Image image = user.getImage();
 
         if (user instanceof Caretaker) {
@@ -124,7 +125,7 @@ public class UserService {
         }
 
         if (image != null) {
-            UploadUtils.deleteFile(image.getUrl());
+            image.deleteImageFile();
         }
     }
 

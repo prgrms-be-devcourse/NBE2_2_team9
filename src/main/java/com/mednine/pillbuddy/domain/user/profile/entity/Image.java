@@ -1,6 +1,7 @@
 package com.mednine.pillbuddy.domain.user.profile.entity;
 
 import com.mednine.pillbuddy.global.entity.BaseTimeEntity;
+import com.mednine.pillbuddy.global.util.UploadUtils;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -31,5 +32,9 @@ public class Image extends BaseTimeEntity {
 
     public void updateUrl(String url) {
         this.url = url;
+    }
+
+    public void deleteImageFile() {
+        UploadUtils.deleteFile(url);
     }
 }
