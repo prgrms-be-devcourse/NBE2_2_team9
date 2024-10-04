@@ -92,7 +92,7 @@ public class NotificationService {
         }
 
         //약 복용 확인 메세지 전송
-        checkAndNotifyForMissedMedications();
+        checkAndSendForMissedMedications();
     }
 
     private void sendNotificationToCaretaker(Notification notification) {
@@ -127,24 +127,32 @@ public class NotificationService {
     }
 
     //약 복용 확인 메세지 전송
-    public void checkAndNotifyForMissedMedications() {
+    public void checkAndSendForMissedMedications() {
         log.info("사용자가 약을 먹었는지 확인합니다.");
 
         LocalDateTime now = LocalDateTime.now();
         List<UserMedication> userMedications = userMedicationRepository.findAll();
 
         for (UserMedication userMedication : userMedications) {
-            LocalDateTime startDate = userMedication.getStartDate();
-            LocalDateTime fewMinutesAfter = startDate.plusMinutes(15);
-            List<Record> records = recordRepository.findByUserMedication(userMedication);
+            checkNotificationsForUserMedication(userMedication, now);
+        }
+    }
+
+    private void checkNotificationsForUserMedication(UserMedication userMedication, LocalDateTime now) {
+        List<Notification> notifications = userMedication.getNotificationList();
+        List<Record> records = recordRepository.findByUserMedication(userMedication);
+
+        for (Notification notification : notifications) {
+            LocalDateTime notificationTime = notification.getNotificationTime();
+            LocalDateTime fewMinutesAfter = notificationTime.plusMinutes(15);
 
             // 현재 시간이 알림 시간보다 이전인 경우는 체크하지 않음
-            if (now.isBefore(startDate)) {
+            if (now.isBefore(notificationTime)) {
                 continue;
             }
 
             boolean isTaken = records.stream()
-                    .anyMatch(record -> record.getDate().isAfter(startDate) && record.getTaken() == Taken.TAKEN);
+                    .anyMatch(record -> record.getCreatedAt().isAfter(notificationTime) && record.getTaken() == Taken.TAKEN);
 
             if (!isTaken && now.isAfter(fewMinutesAfter)) {
                 log.info("사용자가 약을 복용하지 않은 채 15분이 지났습니다.");
@@ -159,18 +167,18 @@ public class NotificationService {
 
         if (caretakerCaregivers != null && !caretakerCaregivers.isEmpty()) {
             String medicationName = userMedication.getName();
+            String userName = caretaker.getUsername();
 
-            for (CaretakerCaregiver caretakerCaregiver : caretakerCaregivers) {
+            caretakerCaregivers.forEach(caretakerCaregiver -> {
                 Caregiver caregiver = caretakerCaregiver.getCaregiver();
                 String caregiverPhoneNumber = caregiver.getPhoneNumber();
-                String userName = caretaker.getUsername();
                 try {
                     smsProvider.sendCheckNotification(caregiverPhoneNumber, medicationName, userName);
                     log.info("Caregiver에게 메세지 전송 성공");
                 } catch (Exception e) {
                     throw new PillBuddyCustomException(ErrorCode.MESSAGE_SEND_FAILED);
                 }
-            }
+            });
         }
     }
 
@@ -187,3 +195,4 @@ public class NotificationService {
         return userNotificationDTOS;
     }
 }
+
