@@ -20,7 +20,8 @@ public class RecordServiceImpl implements RecordService {
     @Override
     @Transactional
     public RecordDTO modifyTaken(Long userMedicationId, Long recordId) {
-        UserMedication userMedication = userMedicationRepository.findById(userMedicationId).orElse(null);
+        UserMedication userMedication = userMedicationRepository.findById(userMedicationId)
+                .orElseThrow(() -> new PillBuddyCustomException(ErrorCode.MEDICATION_NOT_FOUND));
 
         Record record = userMedication.getRecords().stream()
                 .filter(x -> x.getId().equals(recordId))

@@ -76,7 +76,6 @@ public class CaretakerControllerTest {
         ResponseEntity<RecordDTO> recordDTOResponseEntity = caretakerController.updateMedicationByTaken(userMedicationId, recordId);
 
         assertThat(recordDTOResponseEntity).isNotNull();
-        assertThat(recordDTOResponseEntity.getBody()).isNotNull();
         assertThat(recordDTOResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(recordDTOResponseEntity.getBody().getTaken()).isEqualTo("TAKEN");
     }

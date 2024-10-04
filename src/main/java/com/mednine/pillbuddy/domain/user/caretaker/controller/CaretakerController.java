@@ -20,9 +20,9 @@ import java.util.Map;
 @RequestMapping("/api/caretakers")
 public class CaretakerController {
 
+    private final RecordService recordService;
     private final CaretakerService caretakerService;
     private final UserMedicationService userMedicationService;
-    private final RecordService recordService;
 
     @PostMapping("/{caretakerId}/caregivers/{caregiverId}")
     public ResponseEntity<CaretakerCaregiverDTO> addCaregiver(@PathVariable Long caretakerId, @PathVariable Long caregiverId) {

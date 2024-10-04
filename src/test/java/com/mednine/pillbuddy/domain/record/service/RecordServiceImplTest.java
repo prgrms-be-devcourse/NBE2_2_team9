@@ -11,7 +11,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest
 class RecordServiceImplTest {
-
     @Autowired
     private RecordService recordService;
 

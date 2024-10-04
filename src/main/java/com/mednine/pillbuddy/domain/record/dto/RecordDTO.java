@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 public class RecordDTO {
-
     private Long recordId;
     private LocalDateTime date;
     private String medicationName;
