@@ -3,11 +3,9 @@ package com.mednine.pillbuddy.domain.medicationApi.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mednine.pillbuddy.domain.medicationApi.dto.MedicationDTO;
 import com.mednine.pillbuddy.domain.medicationApi.dto.MedicationForm;
 import com.mednine.pillbuddy.domain.medicationApi.entity.Medication;
-import com.mednine.pillbuddy.domain.medicationApi.repository.MedicationApiRepository;
 import com.mednine.pillbuddy.global.exception.PillBuddyCustomException;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,16 +13,12 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.orm.jpa.JpaSystemException;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
