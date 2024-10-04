@@ -57,7 +57,7 @@ class NotificationControllerTest {
 
     private static final String BASE_URL = "/api/notification";
 
-/*    @Test
+    @Test
     @DisplayName("알림 생성 테스트")
     void createNotifications_test() throws Exception {
         // given
@@ -83,5 +83,5 @@ class NotificationControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("[]"));
-    }*/
+    }
 }
