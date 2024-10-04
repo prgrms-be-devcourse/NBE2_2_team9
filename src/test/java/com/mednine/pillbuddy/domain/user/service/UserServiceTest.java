@@ -25,6 +25,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
@@ -42,6 +43,9 @@ class UserServiceTest {
 
     @Autowired
     private CaregiverRepository caregiverRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     private Caretaker caretaker;
 
@@ -76,7 +80,7 @@ class UserServiceTest {
     @Test
     @DisplayName("JoinDto 를 통해 회원가입 시 중복된 이메일을 입력하면 예외가 발생한다.")
     void join_with_duplicated_email_exception() {
-        String duplicatedEmail = "caretaker1@example.com";
+        String duplicatedEmail = "test-email";
 
         JoinDto joinDto = new JoinDto(
                 "newUser", "newLoginId", "newPassword",
@@ -84,13 +88,13 @@ class UserServiceTest {
 
         assertThatThrownBy(() -> userService.join(joinDto))
                 .isInstanceOf(PillBuddyCustomException.class)
-                .hasMessage("이미 등록된 이메일입니다.");
+                .hasMessage(ErrorCode.USER_ALREADY_REGISTERED_EMAIL.getMessage());
     }
 
     @Test
     @DisplayName("JoinDto 를 통해 회원가입 시 중복된 로그인 아이디를 입력하면 예외가 발생한다.")
     void join_with_duplicated_login_id_exception() {
-        String duplicatedLoginId = "caregiver1";
+        String duplicatedLoginId = "test-loginId";
 
         JoinDto joinDto = new JoinDto(
                 "newUser", duplicatedLoginId, "newPassword",
@@ -98,13 +102,13 @@ class UserServiceTest {
 
         assertThatThrownBy(() -> userService.join(joinDto))
                 .isInstanceOf(PillBuddyCustomException.class)
-                .hasMessage("이미 등록된 아이디입니다.");
+                .hasMessage(ErrorCode.USER_ALREADY_REGISTERED_LOGIN_ID.getMessage());
     }
 
     @Test
-    @DisplayName("JoinDto 를 통해 회원가입 시 중복된 이메일을 입력하면 예외가 발생한다.")
+    @DisplayName("JoinDto 를 통해 회원가입 시 중복된 전화번호를 입력하면 예외가 발생한다.")
     void join_with_duplicated_phoneNumber_exception() {
-        String duplicatedPhoneNumber = "010-1234-5678";
+        String duplicatedPhoneNumber = "test-phoneNumber";
 
         JoinDto joinDto = new JoinDto(
                 "newUser", "newLoginId", "newPassword",
@@ -112,15 +116,15 @@ class UserServiceTest {
 
         assertThatThrownBy(() -> userService.join(joinDto))
                 .isInstanceOf(PillBuddyCustomException.class)
-                .hasMessage("이미 등록된 전화번호입니다.");
+                .hasMessage(ErrorCode.USER_ALREADY_REGISTERED_PHONE_NUMBER.getMessage());
     }
 
     @Test
     @DisplayName("LoginDto 를 통해 로그인을 할 수 있다.")
     void login() {
         // given
-        String loginId = "caregiver3";
-        String password = "password3";
+        String loginId = caretaker.getLoginId();
+        String password = "test-password";
         LoginDto loginDto = new LoginDto(loginId, password);
 
         // when
@@ -141,23 +145,21 @@ class UserServiceTest {
         LoginDto loginDto = new LoginDto(invalidLoginId, password);
 
         // when
-        assertThatThrownBy(() -> {
-            userService.login(loginDto);
-        }).isInstanceOf(InternalAuthenticationServiceException.class)
+        assertThatThrownBy(() -> userService.login(loginDto))
+                .isInstanceOf(InternalAuthenticationServiceException.class)
                 .hasMessage("회원 정보를 찾을 수 없습니다.");
     }
 
     @Test
     @DisplayName("password 가 저장된 비밀번호와 일치하지 않다면, BadCredentialsException 이 발생한다.")
     void login_with_invalid_password() {
-        String invalidLoginId = "caregiver3";
-        String password = "invalidPassword";
-        LoginDto loginDto = new LoginDto(invalidLoginId, password);
+        String loginId = caretaker.getLoginId();
+        String invalidPassword = "invalidPassword";
+        LoginDto loginDto = new LoginDto(loginId, invalidPassword);
 
         // when
-        assertThatThrownBy(() -> {
-            userService.login(loginDto);
-        }).isInstanceOf(BadCredentialsException.class)
+        assertThatThrownBy(() -> userService.login(loginDto))
+                .isInstanceOf(BadCredentialsException.class)
                 .hasMessage("Bad credentials");
     }
 
@@ -165,7 +167,9 @@ class UserServiceTest {
     @DisplayName("사용자는 refreshToken 을 통해 토큰을 재발급 할 수 있다.")
     void reissueToken() {
         // given
-        LoginDto loginDto = new LoginDto("caregiver3", "password3");
+        String loginId = caretaker.getLoginId();
+        String password = "test-password";
+        LoginDto loginDto = new LoginDto(loginId, password);
 
         JwtToken jwtToken = userService.login(loginDto);
         String refreshToken = "Bearer " + jwtToken.getRefreshToken();
@@ -176,7 +180,7 @@ class UserServiceTest {
         Authentication authentication = jwtTokenProvider.getAuthenticationByToken(reissuedAccessToken);
 
         // then
-        assertThat(authentication.getName()).isEqualTo("caregiver3");
+        assertThat(authentication.getName()).isEqualTo(loginId);
         assertThat(authentication.getAuthorities().iterator().next().getAuthority()).isEqualTo("ROLE_USER");
     }
 
@@ -302,7 +306,7 @@ class UserServiceTest {
         caretaker = Caretaker.builder()
                 .username("test-caretaker")
                 .loginId("test-loginId")
-                .password("test-password")
+                .password(passwordEncoder.encode("test-password"))
                 .email("test-email")
                 .phoneNumber("test-phoneNumber")
                 .role(Role.USER)
@@ -313,7 +317,7 @@ class UserServiceTest {
         caregiver = Caregiver.builder()
                 .username("test-caregiver")
                 .loginId("test-loginId")
-                .password("test-password")
+                .password(passwordEncoder.encode("test-password"))
                 .email("test-email")
                 .phoneNumber("test-phoneNumber")
                 .role(Role.USER)
