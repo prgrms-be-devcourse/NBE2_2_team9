@@ -65,4 +65,30 @@ public class CaretakerControllerTest {
         assertThat(recordDTO.getMedicationName()).isEqualTo("Aspirin"); // 약 이름 검증
         assertThat(recordDTO.getTaken()).isEqualTo("TAKEN"); // 복용 여부 검증
     }
+
+    @Test
+    @Transactional
+    @DisplayName("사용자의 약 복용 여부 수정 테스트")
+    public void updateMedicationByTaken() {
+        Long userMedicationId = 2L;
+        Long recordId = 2L;
+
+        ResponseEntity<RecordDTO> recordDTOResponseEntity = caretakerController.updateRecord(userMedicationId, recordId);
+
+        assertThat(recordDTOResponseEntity).isNotNull();
+        assertThat(recordDTOResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(recordDTOResponseEntity.getBody().getTaken()).isEqualTo("TAKEN");
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("사용자의 약 정보에 대한 기록 등록")
+    public void addRecord() {
+        Long userMedicationId = 2L;
+
+        ResponseEntity<RecordDTO> recordDTOResponseEntity = caretakerController.addRecord(userMedicationId);
+        assertThat(recordDTOResponseEntity).isNotNull();
+        assertThat(recordDTOResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(recordDTOResponseEntity.getBody().getTaken()).isEqualTo("UNTAKEN");
+    }
 }

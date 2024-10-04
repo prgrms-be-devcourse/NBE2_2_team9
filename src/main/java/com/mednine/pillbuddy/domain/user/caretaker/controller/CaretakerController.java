@@ -1,6 +1,7 @@
 package com.mednine.pillbuddy.domain.user.caretaker.controller;
 
 import com.mednine.pillbuddy.domain.record.dto.RecordDTO;
+import com.mednine.pillbuddy.domain.record.service.RecordService;
 import com.mednine.pillbuddy.domain.user.caretaker.dto.CaretakerCaregiverDTO;
 import com.mednine.pillbuddy.domain.user.caretaker.service.CaretakerService;
 import com.mednine.pillbuddy.domain.userMedication.service.UserMedicationService;
@@ -19,6 +20,7 @@ import java.util.Map;
 @RequestMapping("/api/caretakers")
 public class CaretakerController {
 
+    private final RecordService recordService;
     private final CaretakerService caretakerService;
     private final UserMedicationService userMedicationService;
 
@@ -41,6 +43,19 @@ public class CaretakerController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         List<RecordDTO> records = userMedicationService.getUserMedicationRecordsByDate(caretakerId, date.atStartOfDay());
         return ResponseEntity.ok(records);
+    }
+
+    @PostMapping("/user-medications/{userMedicationId}/records")
+    public ResponseEntity<RecordDTO> addRecord(@PathVariable Long userMedicationId) {
+        RecordDTO savedRecordDTO = recordService.registerRecord(userMedicationId);
+        return ResponseEntity.ok(savedRecordDTO);
+    }
+
+    @PutMapping("/user-medications/{userMedicationId}/records/{recordId}")
+    public ResponseEntity<RecordDTO> updateRecord(@PathVariable Long userMedicationId,
+                                                  @PathVariable Long recordId) {
+        RecordDTO savedRecordDTO = recordService.modifyTaken(userMedicationId, recordId);
+        return ResponseEntity.ok(savedRecordDTO);
     }
 }
 

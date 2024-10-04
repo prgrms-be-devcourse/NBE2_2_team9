@@ -1,17 +1,16 @@
 package com.mednine.pillbuddy.domain.record.dto;
 
 import com.mednine.pillbuddy.domain.record.entity.Record;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class RecordDTO {
-
     private Long recordId;
     private LocalDateTime date;
     private String medicationName;
