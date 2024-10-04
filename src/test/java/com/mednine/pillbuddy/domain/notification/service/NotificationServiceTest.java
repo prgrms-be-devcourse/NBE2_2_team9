@@ -5,6 +5,9 @@ import com.mednine.pillbuddy.domain.notification.dto.UserNotificationDTO;
 import com.mednine.pillbuddy.domain.notification.entity.Notification;
 import com.mednine.pillbuddy.domain.notification.provider.SmsProvider;
 import com.mednine.pillbuddy.domain.notification.repository.NotificationRepository;
+import com.mednine.pillbuddy.domain.record.RecordRepository;
+import com.mednine.pillbuddy.domain.record.entity.Taken;
+import com.mednine.pillbuddy.domain.record.entity.Record;
 import com.mednine.pillbuddy.domain.user.caregiver.entity.Caregiver;
 import com.mednine.pillbuddy.domain.user.caretaker.entity.Caretaker;
 import com.mednine.pillbuddy.domain.user.caretaker.entity.CaretakerCaregiver;
@@ -53,6 +56,9 @@ class NotificationServiceTest {
 
     @Mock
     private CaretakerRepository caretakerRepository;
+
+    @Mock
+    private RecordRepository recordRepository;
 
     @Mock
     private SmsProvider smsProvider;
@@ -161,6 +167,11 @@ class NotificationServiceTest {
             LocalDateTime now = LocalDateTime.of(2024, 10, 1, 9, 44, 0);
             LocalDateTime nowPlusOneMinute = now.plusMinutes(1);
 
+            String ct_phoneNumber = caretakerCaregiver.getCaretaker().getPhoneNumber();
+            String cg_phoneNumber = caretakerCaregiver.getCaregiver().getPhoneNumber();
+            String medicationName = notification.getUserMedication().getName();
+            String caretakerUsername = caretakerCaregiver.getCaretaker().getUsername();
+
             // Mocking LocalDateTime.now()
             try (MockedStatic<LocalDateTime> mockedStatic = mockStatic(LocalDateTime.class)) {
                 mockedStatic.when(LocalDateTime::now).thenReturn(now);
@@ -172,8 +183,8 @@ class NotificationServiceTest {
                 notificationService.sendNotifications();
 
                 // then
-                verify(smsProvider, times(1)).sendNotification("01012345678", "타이레놀", "사용자이름");
-                verify(smsProvider, times(1)).sendNotification("01056781234", "타이레놀", "사용자이름");
+                verify(smsProvider, times(1)).sendNotification(ct_phoneNumber, medicationName, caretakerUsername);
+                verify(smsProvider, times(1)).sendNotification(cg_phoneNumber, medicationName, caretakerUsername);
                 verify(notificationRepository, times(1)).delete(notification);
             }
         }
@@ -221,6 +232,74 @@ class NotificationServiceTest {
                 assertEquals(ErrorCode.MESSAGE_SEND_FAILED, exception.getErrorCode());
                 verify(notificationRepository, never()).delete(notification);
             }
+        }
+
+        @Test
+        @DisplayName("사용자가 약을 복용하지 않은 채 15분이 지난 경우, 보호자에게 약 복용 확인 메세지를 전송한다")
+        void checkAndNotifyForMissedMedications_SendsNotification() {
+            // given
+            UserMedication testUserMedication = UserMedication.builder()
+                    .id(5L)
+                    .name("타이레놀")
+                    .startDate(LocalDateTime.now().minusMinutes(15))
+                    .endDate(LocalDateTime.now().plusDays(1))
+                    .frequency(Frequency.TWICE_A_DAY)
+                    .caretaker(caretaker)
+                    .build();
+            when(userMedicationRepository.findAll()).thenReturn(Collections.singletonList(testUserMedication));
+            when(recordRepository.findByUserMedication(testUserMedication)).thenReturn(Collections.emptyList());
+            when(caretakerCaregiverRepository.findByCaretaker(caretaker)).thenReturn(Collections.singletonList(caretakerCaregiver));
+
+            // when
+            notificationService.checkAndNotifyForMissedMedications();
+
+            // then
+            verify(smsProvider, times(1)).sendCheckNotification(
+                    "01056781234",
+                    "타이레놀",
+                    "caretaker"
+            );
+        }
+
+        @Test
+        @DisplayName("사용자가 약을 복용한 경우, 보호자에게 약 복용 확인 메세지를 전송하지 않는다")
+        void checkAndNotifyForMissedMedications_DoesNotSendNotificationIfTaken() {
+            // Given
+            UserMedication testUserMedication = UserMedication.builder()
+                    .id(5L)
+                    .name("타이레놀")
+                    .startDate(LocalDateTime.now().minusMinutes(15))
+                    .endDate(LocalDateTime.now().plusDays(1))
+                    .frequency(Frequency.TWICE_A_DAY)
+                    .caretaker(caretaker)
+                    .build();
+
+            List<Record> records = Collections.singletonList(Record.builder()
+                    .date(LocalDateTime.now().minusMinutes(10)) // 10분 전에 복용한 것으로 설정
+                    .taken(Taken.TAKEN)
+                    .build());
+
+            when(userMedicationRepository.findAll()).thenReturn(Collections.singletonList(testUserMedication));
+            when(recordRepository.findByUserMedication(testUserMedication)).thenReturn(records);
+
+            // When
+            notificationService.checkAndNotifyForMissedMedications();
+
+            // Then
+            verify(smsProvider, never()).sendCheckNotification(anyString(), anyString(), anyString());
+        }
+
+        @Test
+        @DisplayName("약 복용 확인 메세지 전송 시, 보호자가 없는 경우 메세지가 전송되지 않는다.")
+        void sendMissedMedicationNotification_NoCaregivers() {
+            // Given
+            when(caretakerCaregiverRepository.findByCaretaker(caretaker)).thenReturn(Collections.emptyList());
+
+            // When
+            notificationService.sendMissedMedicationNotification(userMedication);
+
+            // Then
+            verify(smsProvider, never()).sendCheckNotification(anyString(), anyString(), anyString());
         }
     }
 
@@ -279,4 +358,4 @@ class NotificationServiceTest {
             assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.NOTIFICATION_NOT_FOUND);
         }
     }
-    }
+}

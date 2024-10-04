@@ -127,7 +127,7 @@ public class NotificationService {
     }
 
     //약 복용 확인 메세지 전송
-    private void checkAndNotifyForMissedMedications() {
+    public void checkAndNotifyForMissedMedications() {
         log.info("사용자가 약을 먹었는지 확인합니다.");
 
         LocalDateTime now = LocalDateTime.now();
@@ -153,7 +153,7 @@ public class NotificationService {
         }
     }
 
-    private void sendMissedMedicationNotification(UserMedication userMedication) {
+    public void sendMissedMedicationNotification(UserMedication userMedication) {
         Caretaker caretaker = userMedication.getCaretaker();
         List<CaretakerCaregiver> caretakerCaregivers = caretakerCaregiverRepository.findByCaretaker(caretaker);
 
