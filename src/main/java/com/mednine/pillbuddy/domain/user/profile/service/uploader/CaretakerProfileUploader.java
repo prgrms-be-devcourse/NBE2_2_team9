@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Component
 @RequiredArgsConstructor
 @Transactional
-public class CaretakerProfileUploader implements ProfileUploader{
+public class CaretakerProfileUploader implements ProfileUploader {
 
     private final CaretakerRepository caretakerRepository;
     private final ImageRepository imageRepository;
@@ -32,7 +32,7 @@ public class CaretakerProfileUploader implements ProfileUploader{
 
         if (image != null) {
             // 이미지가 원래 있었다면, 삭제 후 새로운 url 업데이트
-            uploadUtils.deleteFile(image.getUrl());
+            UploadUtils.deleteFile(image.getUrl());
             image.updateUrl(filename);
         } else {
             image = Image.builder()
@@ -44,7 +44,7 @@ public class CaretakerProfileUploader implements ProfileUploader{
             Image save = imageRepository.save(image);
             caretaker.updateImage(save);
         } catch (Exception e) {
-            uploadUtils.deleteFile(filename);
+            UploadUtils.deleteFile(filename);
         }
     }
 }

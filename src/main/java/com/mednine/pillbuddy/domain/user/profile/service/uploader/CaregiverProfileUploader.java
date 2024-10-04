@@ -32,7 +32,7 @@ public class CaregiverProfileUploader implements ProfileUploader {
 
         if (image != null) {
             // 이미지가 원래 있었다면, 삭제 후 새로운 url 업데이트
-            uploadUtils.deleteFile(image.getUrl());
+            UploadUtils.deleteFile(image.getUrl());
             image.updateUrl(filename);
         } else {
             image = Image.builder()
@@ -45,7 +45,7 @@ public class CaregiverProfileUploader implements ProfileUploader {
             Image save = imageRepository.save(image);
             caregiver.updateImage(save);
         } catch (Exception e) {
-            uploadUtils.deleteFile(filename);
+            UploadUtils.deleteFile(filename);
         }
     }
 }
