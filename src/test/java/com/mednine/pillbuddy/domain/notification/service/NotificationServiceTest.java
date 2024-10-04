@@ -172,8 +172,8 @@ class NotificationServiceTest {
                 notificationService.sendNotifications();
 
                 // then
-                verify(smsProvider, times(1)).sendNotification("01012345678", "타이레놀");
-                verify(smsProvider, times(1)).sendNotification("01056781234", "타이레놀");
+                verify(smsProvider, times(1)).sendNotification("01012345678", "타이레놀", "사용자이름");
+                verify(smsProvider, times(1)).sendNotification("01056781234", "타이레놀", "사용자이름");
                 verify(notificationRepository, times(1)).delete(notification);
             }
         }
@@ -195,7 +195,7 @@ class NotificationServiceTest {
                 notificationService.sendNotifications();
 
                 // then
-                verify(smsProvider, never()).sendNotification(any(), any());
+                verify(smsProvider, never()).sendNotification(any(), any(), any());
                 verify(notificationRepository, never()).delete(any());
             }
         }
@@ -214,7 +214,7 @@ class NotificationServiceTest {
                 when(notificationRepository.findByNotificationTime(now, nowPlusOneMinute)).thenReturn(Arrays.asList(notification));
 
                 doThrow(new PillBuddyCustomException(ErrorCode.MESSAGE_SEND_FAILED))
-                        .when(smsProvider).sendNotification(any(), any());
+                        .when(smsProvider).sendNotification(any(), any(), any());
 
                 // when & then
                 PillBuddyCustomException exception = assertThrows(PillBuddyCustomException.class, () -> notificationService.sendNotifications());
