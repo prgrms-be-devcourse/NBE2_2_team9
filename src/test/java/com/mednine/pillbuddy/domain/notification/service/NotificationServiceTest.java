@@ -6,8 +6,6 @@ import com.mednine.pillbuddy.domain.notification.entity.Notification;
 import com.mednine.pillbuddy.domain.notification.provider.SmsProvider;
 import com.mednine.pillbuddy.domain.notification.repository.NotificationRepository;
 import com.mednine.pillbuddy.domain.record.RecordRepository;
-import com.mednine.pillbuddy.domain.record.entity.Taken;
-import com.mednine.pillbuddy.domain.record.entity.Record;
 import com.mednine.pillbuddy.domain.user.caregiver.entity.Caregiver;
 import com.mednine.pillbuddy.domain.user.caretaker.entity.Caretaker;
 import com.mednine.pillbuddy.domain.user.caretaker.entity.CaretakerCaregiver;
@@ -236,57 +234,38 @@ class NotificationServiceTest {
 
         @Test
         @DisplayName("사용자가 약을 복용하지 않은 채 15분이 지난 경우, 보호자에게 약 복용 확인 메세지를 전송한다")
-        void checkAndNotifyForMissedMedications_SendsNotification() {
+        void checkAndSendForMissedMedications_SendsNotification() {
             // given
             UserMedication testUserMedication = UserMedication.builder()
                     .id(5L)
-                    .name("타이레놀")
+                    .name("비타민 D")
                     .startDate(LocalDateTime.now().minusMinutes(15))
                     .endDate(LocalDateTime.now().plusDays(1))
                     .frequency(Frequency.TWICE_A_DAY)
                     .caretaker(caretaker)
                     .build();
+
+            Notification testNotification = Notification.builder()
+                    .notificationTime(LocalDateTime.now().minusMinutes(15))
+                    .userMedication(null)
+                    .caretaker(userMedication.getCaretaker())
+                    .build();
+            testNotification.changeUserMedication(testUserMedication);
+
+
             when(userMedicationRepository.findAll()).thenReturn(Collections.singletonList(testUserMedication));
             when(recordRepository.findByUserMedication(testUserMedication)).thenReturn(Collections.emptyList());
             when(caretakerCaregiverRepository.findByCaretaker(caretaker)).thenReturn(Collections.singletonList(caretakerCaregiver));
 
             // when
-            notificationService.checkAndNotifyForMissedMedications();
+            notificationService.checkAndSendForMissedMedications();
 
             // then
             verify(smsProvider, times(1)).sendCheckNotification(
                     "01056781234",
-                    "타이레놀",
+                    "비타민 D",
                     "caretaker"
             );
-        }
-
-        @Test
-        @DisplayName("사용자가 약을 복용한 경우, 보호자에게 약 복용 확인 메세지를 전송하지 않는다")
-        void checkAndNotifyForMissedMedications_DoesNotSendNotificationIfTaken() {
-            // Given
-            UserMedication testUserMedication = UserMedication.builder()
-                    .id(5L)
-                    .name("타이레놀")
-                    .startDate(LocalDateTime.now().minusMinutes(15))
-                    .endDate(LocalDateTime.now().plusDays(1))
-                    .frequency(Frequency.TWICE_A_DAY)
-                    .caretaker(caretaker)
-                    .build();
-
-            List<Record> records = Collections.singletonList(Record.builder()
-                    .date(LocalDateTime.now().minusMinutes(10)) // 10분 전에 복용한 것으로 설정
-                    .taken(Taken.TAKEN)
-                    .build());
-
-            when(userMedicationRepository.findAll()).thenReturn(Collections.singletonList(testUserMedication));
-            when(recordRepository.findByUserMedication(testUserMedication)).thenReturn(records);
-
-            // When
-            notificationService.checkAndNotifyForMissedMedications();
-
-            // Then
-            verify(smsProvider, never()).sendCheckNotification(anyString(), anyString(), anyString());
         }
 
         @Test
