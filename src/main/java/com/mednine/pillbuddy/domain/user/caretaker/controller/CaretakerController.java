@@ -45,9 +45,15 @@ public class CaretakerController {
         return ResponseEntity.ok(records);
     }
 
-    @PatchMapping("/user-medications/{userMedicationId}/records/{recordId}")
-    public ResponseEntity<RecordDTO> updateMedicationByTaken(@PathVariable Long userMedicationId,
-                                                             @PathVariable Long recordId) {
+    @PostMapping("/user-medications/{userMedicationId}/records")
+    public ResponseEntity<RecordDTO> addRecord(@PathVariable Long userMedicationId) {
+        RecordDTO savedRecordDTO = recordService.registerRecord(userMedicationId);
+        return ResponseEntity.ok(savedRecordDTO);
+    }
+
+    @PutMapping("/user-medications/{userMedicationId}/records/{recordId}")
+    public ResponseEntity<RecordDTO> updateRecord(@PathVariable Long userMedicationId,
+                                                  @PathVariable Long recordId) {
         RecordDTO savedRecordDTO = recordService.modifyTaken(userMedicationId, recordId);
         return ResponseEntity.ok(savedRecordDTO);
     }

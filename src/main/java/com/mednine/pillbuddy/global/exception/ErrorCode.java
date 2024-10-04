@@ -69,7 +69,7 @@ public enum ErrorCode {
 
     RECORD_NOT_FOUND(NOT_FOUND, "저장된 기록을 찾을 수 없습니다"),
     RECORD_NOT_REGISTERED(CONFLICT, "기록 저장에 실패 했습니다"),
-    RECORD_NOT_VALID(CONFLICT, "이미 복용된 약 정보 기록입니다");
+    RECORD_ALREADY_TAKEN(CONFLICT, "이미 복용된 약 정보 기록입니다");
 
     private final HttpStatus httpStatus;
     private final String message;

@@ -25,7 +25,7 @@ public class Record extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "taken", nullable = false)
-    private Taken taken = Taken.UNTAKEN; // 기본 값을 UNTAKEN으로 성정
+    private Taken taken;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_medication_id")
@@ -36,7 +36,7 @@ public class Record extends BaseTimeEntity {
         userMedication.getRecords().add(this);
     }
 
-    public void takeMedication(Taken taken) {
-        this.taken = taken;
+    public void takeMedication() {
+        this.taken = Taken.TAKEN;
     }
 }

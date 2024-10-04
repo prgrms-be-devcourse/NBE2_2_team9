@@ -27,4 +27,15 @@ class RecordServiceImplTest {
         assertThat(modifyTaken.getRecordId()).isEqualTo(2);
         assertThat(modifyTaken.getTaken()).isEqualTo("TAKEN");
     }
+
+    @Test
+    @Transactional
+    @DisplayName("사용자 약 정보 기록 등록")
+    public void registerRecord() {
+        Long userMedicationId = 1L;
+
+        RecordDTO recordDTO = recordService.registerRecord(userMedicationId);
+        assertThat(recordDTO).isNotNull();
+        assertThat(recordDTO.getTaken()).isEqualTo("UNTAKEN");
+    }
 }
