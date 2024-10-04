@@ -32,13 +32,13 @@ public class UploadUtilsTest {
         MockMultipartFile mockFile = new MockMultipartFile("file", "testFile.jpg", "image/jpeg", new byte[]{1, 2, 3, 4});
 
         // When
-        String savedFileName = uploadUtils.upload(mockFile);
+        String savedFilePath = uploadUtils.upload(mockFile);
 
         // Then
-        File uploadedFile = new File(tempDir.toFile(), savedFileName);
+        File uploadedFile = new File(savedFilePath);
         assertThat(uploadedFile.exists()).isTrue();
         assertThat(uploadedFile.getName()).contains("testFile");
-        assertThat(savedFileName).contains("_");
+        assertThat(savedFilePath).contains("_");
     }
 
     @Test

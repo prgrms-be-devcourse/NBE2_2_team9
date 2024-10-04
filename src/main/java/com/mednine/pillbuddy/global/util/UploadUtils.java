@@ -5,6 +5,7 @@ import com.mednine.pillbuddy.global.exception.PillBuddyCustomException;
 import jakarta.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -42,7 +43,7 @@ public class UploadUtils {
         } catch (IOException e) {
             throw new PillBuddyCustomException(ErrorCode.PROFILE_NOT_SUPPORT_FILE_TYPE);
         }
-        return saveFileName;
+        return Paths.get(uploadPath, saveFileName).toString();
     }
 
     // 파일 이름에 특수 문자나 공백이 포함되어 있는 경우, 그 문자를 밑줄(_)로 대체
@@ -50,8 +51,8 @@ public class UploadUtils {
         return fileName.replaceAll(FILE_NAME_REGEX, FILE_NAME_REPLACEMENT);
     }
 
-    public void deleteFile(String fileName) {
-        File file = new File(uploadPath, fileName);
+    public void deleteFile(String filePath) {
+        File file = new File(filePath);
 
         if (file.exists() && !file.delete()) {
             throw new PillBuddyCustomException(ErrorCode.PROFILE_DELETE_FILE_FAIL);
