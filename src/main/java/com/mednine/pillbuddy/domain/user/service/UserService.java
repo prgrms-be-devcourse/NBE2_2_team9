@@ -33,7 +33,10 @@ public class UserService {
 
     public UserDto join(JoinDto joinDto) {
         validateJoinInfo(joinDto);
-        joinDto.encodePassword(passwordEncoder);
+
+        // 비밀번호 암호화
+        String encodedPassword = passwordEncoder.encode(joinDto.getPassword());
+        joinDto.changeEncodedPassword(encodedPassword);
 
         // 사용자 타입에 따라 회원 저장
         return switch (joinDto.getUserType()) {
