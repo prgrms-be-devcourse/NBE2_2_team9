@@ -10,6 +10,7 @@ import static org.springframework.http.HttpStatus.*;
 @RequiredArgsConstructor
 public enum ErrorCode {
 
+    USER_MISMATCHED_ID_OR_PASSWORD(CONFLICT, "로그인 아이디 혹은 비밀번호가 잘못되었습니다."),
     USER_AUTHENTICATION_REQUIRED(UNAUTHORIZED, "인증이 필요한 회원입니다."),
     USER_NOT_FOUND(NOT_FOUND, "회원 정보를 찾을 수 없습니다."),
     USER_ALREADY_REGISTERED_EMAIL(CONFLICT, "이미 등록된 이메일입니다."),
