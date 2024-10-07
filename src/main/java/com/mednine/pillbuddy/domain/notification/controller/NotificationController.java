@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -32,5 +33,11 @@ public class NotificationController {
     @GetMapping("/user/{caretakerId}")
     public ResponseEntity<List<UserNotificationDTO>> findNotifications(@PathVariable Long caretakerId) {
         return ResponseEntity.ok(notificationService.findNotification(caretakerId));
+    }
+
+    @PatchMapping("/{notificationId}/{notificationTime}")
+    public ResponseEntity<NotificationDTO> updateNotificationTime(
+            @PathVariable Long notificationId, @PathVariable LocalDateTime notificationTime) {
+        return ResponseEntity.ok(notificationService.updateNotification(notificationId, notificationTime));
     }
 }
