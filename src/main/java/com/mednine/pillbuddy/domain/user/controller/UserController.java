@@ -29,34 +29,6 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping("/join")
-    public ResponseEntity<UserDto> join(@Validated @RequestBody JoinDto joinDto) {
-        UserDto userDto = userService.join(joinDto);
-
-        return ResponseEntity.ok(userDto);
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<JwtToken> login(@RequestBody LoginDto loginDto) {
-        JwtToken jwtToken = userService.login(loginDto);
-
-        return ResponseEntity.ok(jwtToken);
-    }
-
-    @PostMapping("/logout")
-    public ResponseEntity<Void> logout() {
-        userService.logout();
-
-        return ResponseEntity.noContent().build();
-    }
-
-    @PostMapping("/reissue-token")
-    public ResponseEntity<JwtToken> reissueToken(@RequestHeader(HttpHeaders.AUTHORIZATION) String bearerToken) {
-        JwtToken jwtToken = userService.reissueToken(bearerToken);
-
-        return ResponseEntity.ok(jwtToken);
-    }
-
     @GetMapping("/{userId}")
     public ResponseEntity<UserDto> findUserInfo(@PathVariable Long userId, UserType userType) {
         UserDto userDto = userService.findUser(userId, userType);
