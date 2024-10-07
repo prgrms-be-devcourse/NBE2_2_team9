@@ -22,8 +22,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
@@ -146,8 +144,8 @@ class UserServiceTest {
 
         // when
         assertThatThrownBy(() -> userService.login(loginDto))
-                .isInstanceOf(InternalAuthenticationServiceException.class)
-                .hasMessage("회원 정보를 찾을 수 없습니다.");
+                .isInstanceOf(PillBuddyCustomException.class)
+                .hasMessage(ErrorCode.USER_NOT_FOUND.getMessage());
     }
 
     @Test
@@ -159,8 +157,8 @@ class UserServiceTest {
 
         // when
         assertThatThrownBy(() -> userService.login(loginDto))
-                .isInstanceOf(BadCredentialsException.class)
-                .hasMessage("Bad credentials");
+                .isInstanceOf(PillBuddyCustomException.class)
+                .hasMessage(ErrorCode.USER_MISMATCHED_ID_OR_PASSWORD.getMessage());
     }
 
     @Test

@@ -17,8 +17,6 @@ import com.mednine.pillbuddy.global.exception.PillBuddyCustomException;
 import com.mednine.pillbuddy.global.jwt.JwtToken;
 import com.mednine.pillbuddy.global.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,7 +32,7 @@ public class UserService {
     private final CaretakerRepository caretakerRepository;
     private final CaregiverRepository caregiverRepository;
     private final PasswordEncoder passwordEncoder;
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final MyUserDetailsService userDetailsService;
     private final JwtTokenProvider jwtTokenProvider;
 
     public UserDto join(JoinDto joinDto) {
@@ -53,12 +51,16 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public JwtToken login(LoginDto loginDto) {
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginDto.getLoginId(), loginDto.getPassword());
+        // 로그인 아이디를 통해 회원 조회
+        CustomUserDetails userDetails = userDetailsService.loadUserByUsername(loginDto.getLoginId());
 
-        // 사용자 유효성 검증
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        // 비밀번호 일치 여부 확인
+        if (!passwordEncoder.matches(loginDto.getPassword(), userDetails.getPassword())) {
+            throw new PillBuddyCustomException(ErrorCode.USER_MISMATCHED_ID_OR_PASSWORD);
+        }
 
-        return jwtTokenProvider.generateToken(authentication);
+        // 로그인 아이디를 통해 Jwt 토큰 생성 후 반환
+        return jwtTokenProvider.generateToken(loginDto.getLoginId());
     }
 
     @Transactional(propagation = Propagation.NEVER)
@@ -77,7 +79,7 @@ public class UserService {
         String refreshToken = jwtTokenProvider.resolveToken(bearerToken);
 
         // 토큰 유효성 검사
-        if (refreshToken == null || !jwtTokenProvider.validateToken(refreshToken)) {
+        if (refreshToken == null || !jwtTokenProvider.validateToken(refreshToken) || !jwtTokenProvider.isRefreshToken(refreshToken)) {
             throw new PillBuddyCustomException(ErrorCode.JWT_TOKEN_INVALID);
         }
 

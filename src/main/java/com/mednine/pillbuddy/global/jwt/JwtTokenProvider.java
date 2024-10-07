@@ -6,6 +6,7 @@ import com.mednine.pillbuddy.global.exception.ErrorCode;
 import com.mednine.pillbuddy.global.exception.PillBuddyCustomException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -14,6 +15,8 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import java.security.Key;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,6 +30,8 @@ import org.springframework.util.StringUtils;
 public class JwtTokenProvider {
 
     private static final String GRANT_TYPE = "Bearer";
+    private static final String ACCESS_TOKEN_TYPE = "ACCESS";
+    private static final String REFRESH_TOKEN_TYPE = "REFRESH";
 
     private final Key key;
 
@@ -46,10 +51,10 @@ public class JwtTokenProvider {
         this.myUserDetailsService = myUserDetailsService;
     }
 
-    public JwtToken generateToken(Authentication authentication) {
+    public JwtToken generateToken(String loginId) {
         Date now = new Date();
-        String accessToken = getAccessToken(authentication, now);
-        String refreshToken = getRefreshToken(authentication, now);
+        String accessToken = getAccessToken(loginId, now);
+        String refreshToken = getRefreshToken(loginId, now);
 
         return JwtToken.builder()
                 .accessToken(accessToken)
@@ -61,21 +66,21 @@ public class JwtTokenProvider {
     public JwtToken reissueAccessToken(String refreshToken) {
         String loginId = getLoginId(refreshToken);
         CustomUserDetails userDetails = myUserDetailsService.loadUserByUsername(loginId);
-        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, "",
-                userDetails.getAuthorities());
-        return generateToken(authentication);
+
+        return generateToken(userDetails.getUsername());
     }
 
     /**
      * Access 토큰 생성
      */
-    public String getAccessToken(Authentication authentication, Date now) {
+    public String getAccessToken(String loginId, Date now) {
         Date accessTokenExpireDate = new Date(now.getTime() + accessExpirationTime);
 
         Claims claims = Jwts.claims();
-        claims.setSubject(authentication.getName());
+        claims.setSubject(loginId);
 
         return Jwts.builder()
+                .setHeader(setHeader(ACCESS_TOKEN_TYPE))
                 .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(accessTokenExpireDate)
@@ -86,18 +91,27 @@ public class JwtTokenProvider {
     /**
      * Refresh 토큰 생성
      */
-    public String getRefreshToken(Authentication authentication, Date now) {
+    public String getRefreshToken(String loginId, Date now) {
         Date refreshTokenExpireDate = new Date(now.getTime() + refreshExpirationTime);
 
         Claims claims = Jwts.claims();
-        claims.setSubject(authentication.getName());
+        claims.setSubject(loginId);
 
         return Jwts.builder()
+                .setHeader(setHeader(REFRESH_TOKEN_TYPE))
                 .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(refreshTokenExpireDate)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    private Map<String, Object> setHeader(String type) {
+        Map<String, Object> header = new HashMap<>();
+        header.put("type", "JWT");
+        header.put("tokenType", type);
+        header.put("alg", "HS256");
+        return header;
     }
 
     /**
@@ -144,6 +158,24 @@ public class JwtTokenProvider {
         } catch (UnsupportedJwtException e) {
             throw new PillBuddyCustomException(ErrorCode.JWT_TOKEN_UNSUPPORTED);
         }
+    }
+
+    public boolean isAccessToken(String token) {
+        JwsHeader header = getHeader(token);
+        return ACCESS_TOKEN_TYPE.equals(header.get("tokenType"));
+    }
+
+    public boolean isRefreshToken(String token) {
+        JwsHeader header = getHeader(token);
+        return REFRESH_TOKEN_TYPE.equals(header.get("tokenType"));
+    }
+
+    private JwsHeader getHeader(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getHeader();
     }
 
     /**
