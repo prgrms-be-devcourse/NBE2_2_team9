@@ -51,10 +51,10 @@ public class JwtTokenProvider {
         this.myUserDetailsService = myUserDetailsService;
     }
 
-    public JwtToken generateToken(Authentication authentication) {
+    public JwtToken generateToken(String loginId) {
         Date now = new Date();
-        String accessToken = getAccessToken(authentication, now);
-        String refreshToken = getRefreshToken(authentication, now);
+        String accessToken = getAccessToken(loginId, now);
+        String refreshToken = getRefreshToken(loginId, now);
 
         return JwtToken.builder()
                 .accessToken(accessToken)
@@ -66,19 +66,18 @@ public class JwtTokenProvider {
     public JwtToken reissueAccessToken(String refreshToken) {
         String loginId = getLoginId(refreshToken);
         CustomUserDetails userDetails = myUserDetailsService.loadUserByUsername(loginId);
-        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, "",
-                userDetails.getAuthorities());
-        return generateToken(authentication);
+
+        return generateToken(userDetails.getUsername());
     }
 
     /**
      * Access 토큰 생성
      */
-    public String getAccessToken(Authentication authentication, Date now) {
+    public String getAccessToken(String loginId, Date now) {
         Date accessTokenExpireDate = new Date(now.getTime() + accessExpirationTime);
 
         Claims claims = Jwts.claims();
-        claims.setSubject(authentication.getName());
+        claims.setSubject(loginId);
 
         return Jwts.builder()
                 .setHeader(setHeader(ACCESS_TOKEN_TYPE))
@@ -92,11 +91,11 @@ public class JwtTokenProvider {
     /**
      * Refresh 토큰 생성
      */
-    public String getRefreshToken(Authentication authentication, Date now) {
+    public String getRefreshToken(String loginId, Date now) {
         Date refreshTokenExpireDate = new Date(now.getTime() + refreshExpirationTime);
 
         Claims claims = Jwts.claims();
-        claims.setSubject(authentication.getName());
+        claims.setSubject(loginId);
 
         return Jwts.builder()
                 .setHeader(setHeader(REFRESH_TOKEN_TYPE))

@@ -17,7 +17,6 @@ import com.mednine.pillbuddy.global.exception.PillBuddyCustomException;
 import com.mednine.pillbuddy.global.jwt.JwtToken;
 import com.mednine.pillbuddy.global.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -60,10 +59,8 @@ public class UserService {
             throw new PillBuddyCustomException(ErrorCode.USER_MISMATCHED_ID_OR_PASSWORD);
         }
 
-        // 사용자 정보 생성
-        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
-
-        return jwtTokenProvider.generateToken(authentication);
+        // 로그인 아이디를 통해 Jwt 토큰 생성 후 반환
+        return jwtTokenProvider.generateToken(loginDto.getLoginId());
     }
 
     @Transactional(propagation = Propagation.NEVER)
