@@ -6,121 +6,89 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.mednine.pillbuddy.domain.medicationApi.dto.MedicationDTO;
 import com.mednine.pillbuddy.domain.medicationApi.dto.MedicationForm;
 import com.mednine.pillbuddy.domain.medicationApi.entity.Medication;
-import com.mednine.pillbuddy.domain.medicationApi.repository.MedicationApiRepository;
 import com.mednine.pillbuddy.global.exception.PillBuddyCustomException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.orm.jpa.JpaSystemException;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 @SpringBootTest
+@Transactional
 class MedicationApiServiceTest {
 
     @Autowired
     private MedicationApiService medicationApiService;
-    @Autowired
-    private MedicationApiRepository medicationApiRepository;
+    @MockBean
+    RestTemplate restTemplate;
     @BeforeEach
     void setUp() {
         List<Medication> medicationList = new ArrayList<>();
         MedicationDTO medicationDTO1 = new MedicationDTO();
         medicationDTO1.setItemSeq("199000505");
         medicationDTO1.setItemName("아스피린1");
-
         MedicationDTO medicationDTO2 = new MedicationDTO();
         medicationDTO2.setItemSeq("199000506");
         medicationDTO2.setItemName("아스피린2");
         medicationList.add(Medication.createMedication(medicationDTO1));
         medicationList.add(Medication.createMedication(medicationDTO2));
-        medicationApiRepository.saveAll(medicationList);
+        medicationApiService.saveMedication(medicationList.stream().map(Medication::changeDTO).collect(Collectors.toList()));
+        String jsonToString = "{\"header\":{\"resultCode\":\"00\",\"resultMsg\":\"NORMAL SERVICE.\"},\"body\":{\"pageNo\":1,\"totalCount\":1,\"numOfRows\":10,\"items\":[{\"entpName\":\"한국존슨앤드존슨판매(유)\",\"itemName\":\"어린이타이레놀산160밀리그램(아세트아미노펜)\",\"itemSeq\":\"202005623\",\"depositMethodQesitm\":\"실온에서 보관하십시오.\\n\\n어린이의 손이 닿지 않는 곳에 보관하십시오.\\n\",\"itemImage\":null,\"bizrno\":\"1068649891\"}]}}";
+        Mockito.when(restTemplate.getForObject(Mockito.argThat(uri -> uri.toString().contains("%ED%83%80%EC%9D%B4%EB%A0%88%EB%86%80")),Mockito.eq(String.class))).thenReturn(jsonToString);
     }
 
 
     @Test
-    void testJsonToString_Success(){
+    @DisplayName("JSON을 파싱해 DB에 저장되고, 조회시 저장된 DTO가 반환돼야 한다.")
+    void testCreateDto_Success(){
         MedicationForm medicationForm = new MedicationForm();
-        medicationForm.setItemName("아스피린");
-        String[] strings = medicationApiService.jsonToString(medicationForm, 1, 1);
-        assertThat(strings[0]).contains("NORMAL SERVICE");
-        assertThat(strings[1]).isEqualTo("52");
+        medicationForm.setItemName("타이레놀");
+        List<MedicationDTO> dto = medicationApiService.createDto(medicationForm);
+        assertThat(dto.size()).isEqualTo(1);
+        assertThat(dto.get(0).getItemName()).isEqualTo("어린이타이레놀산160밀리그램(아세트아미노펜)");
+        medicationApiService.saveMedication(dto);
+        Page<MedicationDTO> findDto = medicationApiService.findAllByName("타이레놀", 0, 10);
+        assertThat(findDto.getContent().size()).isEqualTo(1);
+        assertThat(findDto.getContent().get(0).getItemName()).isEqualTo("어린이타이레놀산160밀리그램(아세트아미노펜)");
+        assertThat(findDto.getTotalPages()).isEqualTo(1);
     }
 
-
     @Test
-    void testJsonToString_Fail(){
+    @DisplayName("없는 약 이름을 입력했을 때 예외가 발생해야 한다.")
+    void testCreateDto_Fail() {
         MedicationForm medicationForm = new MedicationForm();
-        medicationForm.setItemName("afadfsfa");
-        String[] strings = medicationApiService.jsonToString(medicationForm, 1, 1);
-        assertThatThrownBy(() -> medicationApiService.StringToDTOs(strings[0])).isInstanceOf(PillBuddyCustomException.class);
+        medicationForm.setItemName("asdasd");
+        assertThatThrownBy(() -> medicationApiService.createDto(medicationForm)).isInstanceOf(
+                PillBuddyCustomException.class);
     }
 
 
     @Test
-    void stringToDTOs_success(){
-        MedicationForm form = new MedicationForm();
-        form.setItemName("아스피린");
-        int numOfRows = 10;
-        String[] strings = medicationApiService.jsonToString(form, 1, numOfRows);
-        List<MedicationDTO> medicationDTOS = medicationApiService.StringToDTOs(strings[0]);
-        assertThat(medicationDTOS.size()).isLessThanOrEqualTo(numOfRows);
-        for (MedicationDTO medicationDTO : medicationDTOS) {
-            assertThat(medicationDTO.getItemName()).contains("아스피린");
-        }
-    }
-    @Test
-    void stringToDTOs_Fail(){
-        MedicationForm medicationForm = new MedicationForm();
-        medicationForm.setItemName("afadfsfa");
-        String[] strings = medicationApiService.jsonToString(medicationForm, 1, 1);
-        assertThatThrownBy(() -> medicationApiService.StringToDTOs(strings[0])).isInstanceOf(PillBuddyCustomException.class);
-
-    }
-
-    @Test
+    @DisplayName("저장된 데이터가 조회돼야 한다.")
     void save_Success() {
-
-        PageRequest pageRequest = PageRequest.of(0,2, Sort.by(Sort.Direction.ASC, "itemSeq"));
-        Page<Medication> allByName = medicationApiRepository.findAllByItemNameLike("아스피린",pageRequest);
+        Page<MedicationDTO> allByName = medicationApiService.findAllByName("아스피린",0,10);
         assertThat(allByName.getTotalElements()).isEqualTo(2);
         assertThat(allByName.getTotalPages()).isEqualTo(1);
-
     }
+
     @Test
+    @DisplayName("필수값을 입력하지 않은 데이터는 저장되지 않아야 한다.")
     void save_fail_noName(){
-        List<Medication> medicationList = new ArrayList<>();
+        List<MedicationDTO> medicationDTOList = new ArrayList<>();
         MedicationDTO medicationDTO1 = new MedicationDTO();
         MedicationDTO medicationDTO2 = new MedicationDTO();
-        medicationList.add(Medication.createMedication(medicationDTO1));
-        medicationList.add(Medication.createMedication(medicationDTO2));
-        assertThatThrownBy(() -> medicationApiRepository.saveAll(medicationList)).isInstanceOf(
+        medicationDTOList.add(medicationDTO1);
+        medicationDTOList.add(medicationDTO2);
+        assertThatThrownBy(() -> medicationApiService.saveMedication(medicationDTOList)).isInstanceOf(
                 JpaSystemException.class);
     }
-    @Test
-    void save_fail_duplicationId(){
-        List<Medication> medicationList = new ArrayList<>();
-        MedicationDTO medicationDTO1 = new MedicationDTO();
-        MedicationDTO medicationDTO2 = new MedicationDTO();
-        medicationList.add(Medication.createMedication(medicationDTO1));
-        medicationList.add(Medication.createMedication(medicationDTO2));
-        medicationDTO1.setItemSeq("19990999");
-        medicationDTO2.setItemSeq("19990999");
-        assertThatThrownBy(() -> medicationApiRepository.saveAll(medicationList)).isInstanceOf(
-                JpaSystemException.class);
-    }
-
-    @Test
-    void findByName_fail() {
-        PageRequest pageRequest = PageRequest.of(0,2, Sort.by(Sort.Direction.ASC, "itemSeq"));
-        Page<Medication> allByName = medicationApiRepository.findAllByItemNameLike("sadasd",pageRequest);
-        assertThat(allByName).isEmpty();
-        assertThat(allByName.getTotalElements()).isEqualTo(0);
-        assertThat(allByName.getTotalPages()).isEqualTo(0);
-    }
-
 }

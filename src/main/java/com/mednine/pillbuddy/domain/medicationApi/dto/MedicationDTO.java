@@ -29,5 +29,4 @@ public class MedicationDTO {
 
     @JsonProperty("itemImage")
     private String itemImagePath;
-
 }
