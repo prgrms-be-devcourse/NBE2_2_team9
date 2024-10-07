@@ -336,6 +336,7 @@ class NotificationServiceTest {
     @DisplayName("알림 시간 수정 관련 테스트")
     class ChangeNotificationTests {
         @Test
+        @DisplayName("알림 시간을 수정할 수 있어야 한다.")
         void updateNotification_ValidId_UpdatesNotificationTime() {
             // given
             Long notificationId = 1L;
@@ -353,6 +354,7 @@ class NotificationServiceTest {
         }
 
         @Test
+        @DisplayName("해당하는 알림이 없으면 예외가 발생해야 한다.")
         void updateNotification_InvalidId_ThrowsException() {
             // given
             Long notificationId = 1L;
@@ -363,6 +365,36 @@ class NotificationServiceTest {
             // when & then
             assertThrows(PillBuddyCustomException.class, () -> notificationService.updateNotification(notificationId, newNotificationTime));
             verify(notificationRepository).findById(notificationId);
+        }
+    }
+
+    @Nested
+    @DisplayName("알림 삭제 관련 테스트")
+    class DeleteNotificationTests {
+        @Test
+        @DisplayName("알림을 삭제할 수 있어야 한다.")
+        void deleteNotification_Success() {
+            // given
+            when(notificationRepository.findById(notification.getId())).thenReturn(Optional.of(notification));
+
+            // when
+            notificationService.deleteNotification(notification.getId());
+
+            // then
+            verify(notificationRepository, times(1)).delete(notification);
+        }
+
+        @Test
+        @DisplayName("해당하는 알림이 없으면 예외가 발생해야 한다.")
+        void deleteNotification_NotificationNotFound() {
+            // Given
+            when(notificationRepository.findById(notification.getId())).thenReturn(Optional.empty());
+
+            // When & Then
+            PillBuddyCustomException exception = assertThrows(PillBuddyCustomException.class, () -> notificationService.deleteNotification(notification.getId()));
+
+            assertEquals(ErrorCode.NOTIFICATION_NOT_FOUND, exception.getErrorCode());
+            verify(notificationRepository, never()).delete(any());
         }
     }
 }
