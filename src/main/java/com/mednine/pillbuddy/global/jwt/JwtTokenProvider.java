@@ -4,6 +4,7 @@ import com.mednine.pillbuddy.domain.user.service.CustomUserDetails;
 import com.mednine.pillbuddy.domain.user.service.MyUserDetailsService;
 import com.mednine.pillbuddy.global.exception.ErrorCode;
 import com.mednine.pillbuddy.global.exception.PillBuddyCustomException;
+import com.mednine.pillbuddy.global.redis.RedisUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwsHeader;
@@ -36,6 +37,7 @@ public class JwtTokenProvider {
     private final Key key;
 
     private final MyUserDetailsService myUserDetailsService;
+    private final RedisUtils redisUtils;
 
     @Value("${jwt.token.access-expiration-time}")
     private Long accessExpirationTime;
@@ -44,11 +46,15 @@ public class JwtTokenProvider {
     private Long refreshExpirationTime;
 
     @Autowired
-    public JwtTokenProvider(@Value("${jwt.token.client-secret}") String secretKey,
-                            MyUserDetailsService myUserDetailsService) {
+    public JwtTokenProvider(
+            @Value("${jwt.token.client-secret}") String secretKey,
+            MyUserDetailsService myUserDetailsService,
+            RedisUtils redisUtils
+    ) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
         this.myUserDetailsService = myUserDetailsService;
+        this.redisUtils = redisUtils;
     }
 
     public JwtToken generateToken(String loginId) {
@@ -65,6 +71,14 @@ public class JwtTokenProvider {
 
     public JwtToken reissueAccessToken(String refreshToken) {
         String loginId = getLoginId(refreshToken);
+
+        // refreshToKen 의 남은 유효 기간 가져오기
+        Claims claims = parseClaims(refreshToken);
+        long remainingTime = claims.getExpiration().getTime() - new Date().getTime();
+
+        // refreshToKen 과 Id, 남은 시간을 BlackList 에 저장
+        redisUtils.setBlackList(refreshToken, loginId, 1000L);
+
         CustomUserDetails userDetails = myUserDetailsService.loadUserByUsername(loginId);
 
         return generateToken(userDetails.getUsername());
@@ -146,6 +160,9 @@ public class JwtTokenProvider {
      */
     public boolean validateToken(String token) {
         try {
+            if (redisUtils.hasTokenBlackList(token)) {
+                return false;
+            }
             Jwts.parserBuilder()
                     .setSigningKey(key)
                     .build()
