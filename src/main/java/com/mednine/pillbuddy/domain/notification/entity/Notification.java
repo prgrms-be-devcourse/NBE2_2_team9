@@ -48,6 +48,10 @@ public class Notification extends BaseTimeEntity {
         userMedication.getNotificationList().add(this);
     }
 
+    public void changeNotificationTime(LocalDateTime notificationTime) {
+        this.notificationTime = notificationTime;
+    }
+
     public void changeUser(Caretaker caretaker) {
         this.caretaker = caretaker;
         caretaker.getNotifications().add(this);

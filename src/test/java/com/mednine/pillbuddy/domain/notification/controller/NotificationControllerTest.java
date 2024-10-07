@@ -1,5 +1,6 @@
 package com.mednine.pillbuddy.domain.notification.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mednine.pillbuddy.domain.notification.provider.SmsProvider;
 import com.mednine.pillbuddy.domain.notification.repository.NotificationRepository;
 import com.mednine.pillbuddy.domain.notification.service.NotificationService;
@@ -15,8 +16,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import java.time.LocalDateTime;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -26,6 +28,9 @@ class NotificationControllerTest {
 
     @Autowired
     private MockMvc mvc;
+
+    @Autowired
+    ObjectMapper mapper;
 
     @MockBean
     private NotificationService notificationService;
@@ -62,7 +67,7 @@ class NotificationControllerTest {
     }
 
     @Test
-    @DisplayName("Caretaker ID로 알림을 조회할 수 있어야 한다.")
+    @DisplayName("알림 조회 테스트")
     void findNotifications_test() throws Exception {
         // given
         Long caretakerId = 1L;
@@ -73,5 +78,18 @@ class NotificationControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("[]"));
+    }
+
+    @Test
+    @DisplayName("알림 수정 테스트")
+    void updateNotificationTime_test() throws Exception {
+        // given
+        Long notificationId = 1L;
+        LocalDateTime notificationTime = LocalDateTime.now().plusHours(1);
+
+        // when & then
+        mvc.perform(patch(BASE_URL + "/" + notificationId + "/" + notificationTime)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
     }
 }
