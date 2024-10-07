@@ -144,9 +144,7 @@ class NotificationServiceTest {
             when(userMedicationRepository.findById(1L)).thenReturn(Optional.empty());
 
             // when
-            assertThrows(PillBuddyCustomException.class, () -> {
-                notificationService.createNotifications(1L);
-            });
+            assertThrows(PillBuddyCustomException.class, () -> notificationService.createNotifications(1L));
 
             // then
             verify(userMedicationRepository).findById(1L);
@@ -314,9 +312,7 @@ class NotificationServiceTest {
             when(caretakerRepository.findById(caretakerId)).thenReturn(Optional.empty());
 
             // when & then
-            PillBuddyCustomException exception = assertThrows(PillBuddyCustomException.class, () -> {
-                notificationService.findNotification(caretakerId);
-            });
+            PillBuddyCustomException exception = assertThrows(PillBuddyCustomException.class, () -> notificationService.findNotification(caretakerId));
             assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.CARETAKER_NOT_FOUND);
         }
 
@@ -331,9 +327,7 @@ class NotificationServiceTest {
             when(notificationRepository.findByCaretaker(caretaker)).thenReturn(new ArrayList<>());
 
             // when & then
-            PillBuddyCustomException exception = assertThrows(PillBuddyCustomException.class, () -> {
-                notificationService.findNotification(caretakerId);
-            });
+            PillBuddyCustomException exception = assertThrows(PillBuddyCustomException.class, () -> notificationService.findNotification(caretakerId);
             assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.NOTIFICATION_NOT_FOUND);
         }
     }
@@ -367,9 +361,7 @@ class NotificationServiceTest {
             when(notificationRepository.findById(notificationId)).thenReturn(Optional.empty());
 
             // when & then
-            assertThrows(PillBuddyCustomException.class, () -> {
-                notificationService.updateNotification(notificationId, newNotificationTime);
-            });
+            assertThrows(PillBuddyCustomException.class, () -> notificationService.updateNotification(notificationId, newNotificationTime));
             verify(notificationRepository).findById(notificationId);
         }
     }
