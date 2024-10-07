@@ -5,7 +5,7 @@ import com.mednine.pillbuddy.domain.notification.dto.UserNotificationDTO;
 import com.mednine.pillbuddy.domain.notification.entity.Notification;
 import com.mednine.pillbuddy.domain.notification.provider.SmsProvider;
 import com.mednine.pillbuddy.domain.notification.repository.NotificationRepository;
-import com.mednine.pillbuddy.domain.record.RecordRepository;
+import com.mednine.pillbuddy.domain.record.repository.RecordRepository;
 import com.mednine.pillbuddy.domain.record.entity.Record;
 import com.mednine.pillbuddy.domain.record.entity.Taken;
 import com.mednine.pillbuddy.domain.user.caregiver.entity.Caregiver;
@@ -193,6 +193,14 @@ public class NotificationService {
         }
 
         return userNotificationDTOS;
+    }
+
+    public NotificationDTO updateNotification(Long notificationId, LocalDateTime notificationTime) {
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new PillBuddyCustomException(ErrorCode.NOTIFICATION_NOT_FOUND));
+
+        notification.changeNotificationTime(notificationTime);
+        return NotificationDTO.convertToDTO(notification);
     }
 }
 
