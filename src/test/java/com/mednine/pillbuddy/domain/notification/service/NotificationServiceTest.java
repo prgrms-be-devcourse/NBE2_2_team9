@@ -5,7 +5,7 @@ import com.mednine.pillbuddy.domain.notification.dto.UserNotificationDTO;
 import com.mednine.pillbuddy.domain.notification.entity.Notification;
 import com.mednine.pillbuddy.domain.notification.provider.SmsProvider;
 import com.mednine.pillbuddy.domain.notification.repository.NotificationRepository;
-import com.mednine.pillbuddy.domain.record.RecordRepository;
+import com.mednine.pillbuddy.domain.record.repository.RecordRepository;
 import com.mednine.pillbuddy.domain.user.caregiver.entity.Caregiver;
 import com.mednine.pillbuddy.domain.user.caretaker.entity.Caretaker;
 import com.mednine.pillbuddy.domain.user.caretaker.entity.CaretakerCaregiver;
@@ -335,6 +335,42 @@ class NotificationServiceTest {
                 notificationService.findNotification(caretakerId);
             });
             assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.NOTIFICATION_NOT_FOUND);
+        }
+    }
+
+    @Nested
+    @DisplayName("알림 시간 수정 관련 테스트")
+    class ChangeNotificationTests {
+        @Test
+        void updateNotification_ValidId_UpdatesNotificationTime() {
+            // given
+            Long notificationId = 1L;
+            LocalDateTime newNotificationTime = LocalDateTime.now().plusHours(1);
+
+            when(notificationRepository.findById(notificationId)).thenReturn(Optional.of(notification));
+
+            // when
+            NotificationDTO result = notificationService.updateNotification(notificationId, newNotificationTime);
+
+            // then
+            assertNotNull(result);
+            assertEquals(newNotificationTime, notification.getNotificationTime());
+            verify(notificationRepository).findById(notificationId);
+        }
+
+        @Test
+        void updateNotification_InvalidId_ThrowsException() {
+            // given
+            Long notificationId = 1L;
+            LocalDateTime newNotificationTime = LocalDateTime.now().plusHours(1);
+
+            when(notificationRepository.findById(notificationId)).thenReturn(Optional.empty());
+
+            // when & then
+            assertThrows(PillBuddyCustomException.class, () -> {
+                notificationService.updateNotification(notificationId, newNotificationTime);
+            });
+            verify(notificationRepository).findById(notificationId);
         }
     }
 }
