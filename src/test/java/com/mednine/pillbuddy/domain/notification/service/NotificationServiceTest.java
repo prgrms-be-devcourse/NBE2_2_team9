@@ -327,7 +327,7 @@ class NotificationServiceTest {
             when(notificationRepository.findByCaretaker(caretaker)).thenReturn(new ArrayList<>());
 
             // when & then
-            PillBuddyCustomException exception = assertThrows(PillBuddyCustomException.class, () -> notificationService.findNotification(caretakerId);
+            PillBuddyCustomException exception = assertThrows(PillBuddyCustomException.class, () -> notificationService.findNotification(caretakerId));
             assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.NOTIFICATION_NOT_FOUND);
         }
     }
