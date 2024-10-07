@@ -1,13 +1,11 @@
 package com.mednine.pillbuddy.domain.notification.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mednine.pillbuddy.domain.notification.dto.NotificationDTO;
 import com.mednine.pillbuddy.domain.notification.provider.SmsProvider;
 import com.mednine.pillbuddy.domain.notification.repository.NotificationRepository;
 import com.mednine.pillbuddy.domain.notification.service.NotificationService;
 import com.mednine.pillbuddy.domain.user.caretaker.repository.CaretakerCaregiverRepository;
 import com.mednine.pillbuddy.domain.user.caretaker.repository.CaretakerRepository;
-import com.mednine.pillbuddy.domain.userMedication.entity.Frequency;
 import com.mednine.pillbuddy.domain.userMedication.repository.UserMedicationRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
