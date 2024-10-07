@@ -35,7 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (PillBuddyCustomException e) {
-            log.error("PillBuddyCustomException occurred: {}", e.getMessage());
+            log.error(e.getMessage());
         }
         chain.doFilter(request, response);
     }
