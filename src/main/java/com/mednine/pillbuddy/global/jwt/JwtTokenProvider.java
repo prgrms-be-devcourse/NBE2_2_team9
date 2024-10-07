@@ -6,6 +6,7 @@ import com.mednine.pillbuddy.global.exception.ErrorCode;
 import com.mednine.pillbuddy.global.exception.PillBuddyCustomException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -14,6 +15,8 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import java.security.Key;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,6 +30,8 @@ import org.springframework.util.StringUtils;
 public class JwtTokenProvider {
 
     private static final String GRANT_TYPE = "Bearer";
+    private static final String ACCESS_TOKEN_TYPE = "ACCESS";
+    private static final String REFRESH_TOKEN_TYPE = "REFRESH";
 
     private final Key key;
 
@@ -76,6 +81,7 @@ public class JwtTokenProvider {
         claims.setSubject(authentication.getName());
 
         return Jwts.builder()
+                .setHeader(setHeader(ACCESS_TOKEN_TYPE))
                 .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(accessTokenExpireDate)
@@ -93,11 +99,20 @@ public class JwtTokenProvider {
         claims.setSubject(authentication.getName());
 
         return Jwts.builder()
+                .setHeader(setHeader(REFRESH_TOKEN_TYPE))
                 .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(refreshTokenExpireDate)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    private Map<String, Object> setHeader(String type) {
+        Map<String, Object> header = new HashMap<>();
+        header.put("type", "JWT");
+        header.put("tokenType", type);
+        header.put("alg", "HS256");
+        return header;
     }
 
     /**
@@ -144,6 +159,24 @@ public class JwtTokenProvider {
         } catch (UnsupportedJwtException e) {
             throw new PillBuddyCustomException(ErrorCode.JWT_TOKEN_UNSUPPORTED);
         }
+    }
+
+    public boolean isAccessToken(String token) {
+        JwsHeader header = getHeader(token);
+        return ACCESS_TOKEN_TYPE.equals(header.get("tokenType"));
+    }
+
+    public boolean isRefreshToken(String token) {
+        JwsHeader header = getHeader(token);
+        return REFRESH_TOKEN_TYPE.equals(header.get("tokenType"));
+    }
+
+    private JwsHeader getHeader(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getHeader();
     }
 
     /**

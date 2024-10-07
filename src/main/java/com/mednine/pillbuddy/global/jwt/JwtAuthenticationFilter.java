@@ -33,7 +33,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String token = jwtTokenProvider.resolveToken(bearerToken);
 
             // token 유효성 검증
-            if (token != null && jwtTokenProvider.validateToken(token)) {
+            if (token != null && jwtTokenProvider.validateToken(token) && jwtTokenProvider.isAccessToken(token)) {
                 // token 의 loginId 를 통해 권한 정보를 조회하여 SecurityContext 에 저장
                 Authentication authentication = jwtTokenProvider.getAuthenticationByToken(token);
                 SecurityContextHolder.getContext().setAuthentication(authentication);

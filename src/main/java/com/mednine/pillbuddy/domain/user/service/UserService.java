@@ -77,7 +77,7 @@ public class UserService {
         String refreshToken = jwtTokenProvider.resolveToken(bearerToken);
 
         // 토큰 유효성 검사
-        if (refreshToken == null || !jwtTokenProvider.validateToken(refreshToken)) {
+        if (refreshToken == null || !jwtTokenProvider.validateToken(refreshToken) || !jwtTokenProvider.isRefreshToken(refreshToken)) {
             throw new PillBuddyCustomException(ErrorCode.JWT_TOKEN_INVALID);
         }
 
