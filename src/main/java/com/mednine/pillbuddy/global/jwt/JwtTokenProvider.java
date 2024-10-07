@@ -77,7 +77,7 @@ public class JwtTokenProvider {
         long remainingTime = claims.getExpiration().getTime() - new Date().getTime();
 
         // refreshToKen 과 Id, 남은 시간을 BlackList 에 저장
-        redisUtils.setBlackList(refreshToken, loginId, 1000L);
+        redisUtils.setBlackList(refreshToken, loginId, remainingTime);
 
         CustomUserDetails userDetails = myUserDetailsService.loadUserByUsername(loginId);
 
