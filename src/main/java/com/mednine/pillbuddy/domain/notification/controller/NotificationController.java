@@ -40,4 +40,11 @@ public class NotificationController {
             @PathVariable Long notificationId, @PathVariable LocalDateTime notificationTime) {
         return ResponseEntity.ok(notificationService.updateNotification(notificationId, notificationTime));
     }
+
+    @DeleteMapping("/{notificationId}")
+    public ResponseEntity<String> deleteNotification(@PathVariable Long notificationId) {
+        notificationService.deleteNotification(notificationId);
+
+        return ResponseEntity.ok("삭제되었습니다. Id: " + notificationId);
+    }
 }

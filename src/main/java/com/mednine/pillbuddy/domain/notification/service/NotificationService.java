@@ -202,5 +202,11 @@ public class NotificationService {
         notification.changeNotificationTime(notificationTime);
         return NotificationDTO.convertToDTO(notification);
     }
+
+    public void deleteNotification(Long notificationId) {
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new PillBuddyCustomException(ErrorCode.NOTIFICATION_NOT_FOUND));
+        notificationRepository.delete(notification);
+    }
 }
 

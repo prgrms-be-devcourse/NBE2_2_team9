@@ -92,4 +92,17 @@ class NotificationControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
+
+    @Test
+    @DisplayName("알림 삭제 테스트")
+    void deleteNotificationTime_test() throws Exception {
+        // given
+        Long notificationId = 1L;
+
+        // when & then
+        mvc.perform(delete(BASE_URL + "/" + notificationId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().string("삭제되었습니다. Id: " + notificationId));
+    }
 }
