@@ -5,12 +5,10 @@ import com.mednine.pillbuddy.domain.user.dto.UserPasswordUpdateDto;
 import com.mednine.pillbuddy.domain.user.dto.UserType;
 import com.mednine.pillbuddy.domain.user.dto.UserUpdateDto;
 import com.mednine.pillbuddy.domain.user.service.UserService;
-import com.mednine.pillbuddy.global.jwt.JwtToken;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,13 +22,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
-@Tag(name = "이용자 기능",description = "사이트 이용을 위한 회원가입, 회원정보 수정 등 다양한 기능을 제공한다.")
+@Tag(name = "회원정보 관련 기능",description = "회원정보 수정, 조회 및 회원탈퇴 기능을 제공한다.")
 public class UserController {
 
     private final UserService userService;
-
+    @Operation(description = "이용자는 자신의 회원정보를 조회할 수 있다.")
     @GetMapping("/{userId}")
-    public ResponseEntity<UserDto> findUserInfo(@PathVariable Long userId,@ParameterObject UserType userType) {
+    public ResponseEntity<UserDto> findUserInfo(@PathVariable Long userId, UserType userType) {
         UserDto userDto = userService.findUser(userId, userType);
 
         return ResponseEntity.ok(userDto);
@@ -55,9 +53,9 @@ public class UserController {
 
         return ResponseEntity.ok(userDto);
     }
-    @Operation(description = "이용자는 회원 탈퇴할 수 있다.")
+    @Operation(description = "이용자는 회원 탈퇴를 할 수 있다.")
     @DeleteMapping("/{userId}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long userId,@ParameterObject UserType userType) {
+    public ResponseEntity<Void> deleteUser(@PathVariable Long userId, UserType userType) {
         userService.deleteUser(userId, userType);
 
         return ResponseEntity.noContent().build();
