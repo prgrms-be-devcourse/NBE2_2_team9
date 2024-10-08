@@ -37,12 +37,13 @@ public class NotificationController {
     public void checkAndSendNotifications() {
         notificationService.sendNotifications();
     }
-    @Operation(description = "사용자는 설정된 알림 정보를 조회하고, 사용자와 관련된 모든 보호자에게 약 복용 알림 메시지를 자동으로 전송한다.")
+
+    @Operation(description = "사용자는 설정된 알림 정보를 조회할 수 있다.")
     @GetMapping("/user/{caretakerId}")
     public ResponseEntity<List<UserNotificationDTO>> findNotifications(@PathVariable Long caretakerId) {
         return ResponseEntity.ok(notificationService.findNotification(caretakerId));
     }
-    @Operation(description = "사용자는 설정된 알림 정보를 수정할 수 있다.")
+    @Operation(description = "사용자는 설정된 알림 시간을 수정할 수 있다.")
     @PatchMapping("/{notificationId}/{notificationTime}")
     public ResponseEntity<NotificationDTO> updateNotificationTime(
             @PathVariable Long notificationId, @PathVariable LocalDateTime notificationTime) {
