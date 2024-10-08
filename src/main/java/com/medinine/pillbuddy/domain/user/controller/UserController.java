@@ -21,18 +21,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
-@Tag(name = "회원정보 관련 기능",description = "회원정보 수정, 조회 및 회원탈퇴 기능을 제공한다.")
+@Tag(name = "회원정보 관련 기능", description = "회원정보 수정, 조회 및 회원탈퇴 기능을 제공한다.")
 public class UserController {
 
     private final UserService userService;
-    @Operation(description = "이용자는 자신의 회원정보를 조회할 수 있다.")
+
+    @Operation(description = "사용자는 자신의 회원정보를 조회할 수 있다.")
     @GetMapping("/{userId}")
     public ResponseEntity<UserDto> findUserInfo(@PathVariable Long userId, UserType userType) {
         UserDto userDto = userService.findUser(userId, userType);
 
         return ResponseEntity.ok(userDto);
     }
-    @Operation(description = "이용자는 회원정보를 수정할 수 있다.")
+
+    @Operation(description = "사용자는 회원정보를 수정할 수 있다.")
     @PutMapping("/{userId}")
     public ResponseEntity<UserDto> updateUserInfo(
             @PathVariable Long userId,
@@ -42,17 +44,19 @@ public class UserController {
 
         return ResponseEntity.ok(userDto);
     }
-    @Operation(description = "이용자는 비밀번호를 수정할 수 있다.")
+
+    @Operation(description = "사용자는 비밀번호를 수정할 수 있다.")
     @PutMapping("/{userId}/password")
     public ResponseEntity<UserDto> updateUserPassword(
             @PathVariable Long userId,
             @Validated @RequestBody UserPasswordUpdateDto userPasswordUpdateDto
-            ) {
+    ) {
         UserDto userDto = userService.updateUserPassword(userId, userPasswordUpdateDto);
 
         return ResponseEntity.ok(userDto);
     }
-    @Operation(description = "이용자는 회원 탈퇴를 할 수 있다.")
+
+    @Operation(description = "사용자는 회원 탈퇴를 할 수 있다.")
     @DeleteMapping("/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long userId, UserType userType) {
         userService.deleteUser(userId, userType);

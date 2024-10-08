@@ -16,25 +16,31 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/caregivers/{caregiverId}/caretakers")
 @RequiredArgsConstructor
-@Tag(name = "보호자 기능",description = "보호자는 사용자를 등록,삭제할 수 있으며, 사용자의 약 정보를 확인할 수 있다.")
+@Tag(name = "보호자 기능", description = "보호자는 사용자를 등록,삭제할 수 있으며, 사용자의 약 정보를 확인할 수 있다.")
 public class CaregiverController {
 
     private final CaregiverService caregiverService;
+
     @Operation(description = "보호자는 사용자의 약 정보를 확인할 수 있다.")
     @GetMapping("/{caretakerId}/caretaker-medications")
-    public ResponseEntity<List<UserMedicationDTO>> getCaretakerMedications(@PathVariable Long caregiverId, @PathVariable Long caretakerId) {
+    public ResponseEntity<List<UserMedicationDTO>> getCaretakerMedications(@PathVariable Long caregiverId,
+                                                                           @PathVariable Long caretakerId) {
         List<UserMedicationDTO> medications = caregiverService.getCaretakerMedications(caregiverId, caretakerId);
         return ResponseEntity.status(HttpStatus.OK).body(medications);
     }
+
     @Operation(description = "보호자는 사용자를 등록할 수 있다.")
     @PostMapping
-    public ResponseEntity<CaretakerCaregiverDTO> addCaretaker(@PathVariable Long caregiverId, @RequestParam Long caretakerId) {
+    public ResponseEntity<CaretakerCaregiverDTO> addCaretaker(@PathVariable Long caregiverId,
+                                                              @RequestParam Long caretakerId) {
         CaretakerCaregiverDTO savedCaretakerCaregiverDTO = caregiverService.register(caregiverId, caretakerId);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedCaretakerCaregiverDTO);
     }
+
     @Operation(description = "보호자는 사용자를 삭제할 수 있다.")
     @DeleteMapping("/{caretakerId}")
-    public ResponseEntity<Map<String, String>> deleteCaretaker(@PathVariable Long caregiverId, @PathVariable Long caretakerId) {
+    public ResponseEntity<Map<String, String>> deleteCaretaker(@PathVariable Long caregiverId,
+                                                               @PathVariable Long caretakerId) {
         caregiverService.remove(caregiverId, caretakerId);
         Map<String, String> result = Map.of("Process", "Success");
         return ResponseEntity.ok(result);
