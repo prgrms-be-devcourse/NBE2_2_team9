@@ -47,7 +47,7 @@ public class CaretakerController {
         List<RecordDTO> records = userMedicationService.getUserMedicationRecordsByDate(caretakerId, date.atStartOfDay());
         return ResponseEntity.ok(records);
     }
-    @Operation(description = "사용자는 새로운 약 복용 기록을 등록할 수 있다.")
+    @Operation(description = "사용자는 새로운 약의 복용 기록을 등록할 수 있다.")
     @PostMapping("/user-medications/{userMedicationId}/records")
     public ResponseEntity<RecordDTO> addRecord(@PathVariable Long userMedicationId) {
         RecordDTO savedRecordDTO = recordService.registerRecord(userMedicationId);
