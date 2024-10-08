@@ -5,6 +5,7 @@ DROP TABLE IF EXISTS user_medication CASCADE;
 DROP TABLE IF EXISTS caretaker_caregiver CASCADE;
 DROP TABLE IF EXISTS caretaker CASCADE;
 DROP TABLE IF EXISTS caregiver CASCADE;
+DROP TABLE IF EXISTS medication CASCADE;
 
 CREATE TABLE image
 (
@@ -109,4 +110,20 @@ CREATE TABLE record
     modified_at        DATETIME(6),
     PRIMARY KEY (record_id),
     FOREIGN KEY (user_medication_id) REFERENCES user_medication (user_medication_id)
+);
+
+CREATE TABLE medication
+(
+    item_seq              varchar(15)               NOT NULL,
+    item_name             varchar(100),
+    entp_name             varchar(100),
+    efcy_qesitm           text,
+    use_method_qesitm     text,
+    atpn_warn_qesitm      text,
+    atpn_qesitm           text,
+    intrc_qesitm          text,
+    se_qesitm             text,
+    deposit_method_qesitm text,
+    item_image_path       text,
+PRIMARY KEY (item_seq)
 );
