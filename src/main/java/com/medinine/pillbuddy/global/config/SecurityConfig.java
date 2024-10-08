@@ -47,10 +47,12 @@ public class SecurityConfig {
                 // api 테스트 시 편의를 위해 잠시 모든 요청 허용
                 .authorizeHttpRequests(req ->
                         req.requestMatchers("/api/users/join",
-                                            "/api/users/login",
-                                            "/api/users/reissue-token",
-                                            "api/search").permitAll()
-                            .anyRequest().hasRole("USER")
+                                        "/api/users/login",
+                                        "/api/users/reissue-token",
+                                        "api/search",
+                                        "/swagger-ui/**",
+                                        "/v3/api-docs/**").permitAll()
+                                .anyRequest().hasRole("USER")
                 )
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
