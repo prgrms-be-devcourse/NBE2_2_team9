@@ -1,5 +1,6 @@
 package com.mednine.pillbuddy.domain.medicationApi.service;
 
+import static com.mednine.pillbuddy.global.exception.ErrorCode.ERROR_CONNECTION;
 import static com.mednine.pillbuddy.global.exception.ErrorCode.MEDICATION_NOT_FOUND;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -14,18 +15,21 @@ import com.mednine.pillbuddy.global.exception.PillBuddyCustomException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 @Service
@@ -47,19 +51,23 @@ public class MedicationApiService {
 
     public List<MedicationDTO> createDto(MedicationForm medicationForm) {
 
-        String JsonToString = restTemplate.getForObject(createUrl(medicationForm, 0),
-                String.class);
         try {
-            Integer totalCount = objectMapper.readValue(objectMapper.readTree(JsonToString).path("body").path("totalCount").toString(), Integer.class);
+            String JsonToString = restTemplate.getForObject(createUrl(medicationForm, 0),
+                    String.class);
+            Integer totalCount = objectMapper.readValue(
+                    objectMapper.readTree(JsonToString).path("body").path("totalCount").toString(), Integer.class);
             JsonToString = restTemplate.getForObject(createUrl(medicationForm, totalCount),
                     String.class);
 
             JsonNode rootNode = objectMapper.readTree(JsonToString);
             JsonNode itemsNode = rootNode.path("body").path("items");
-            return objectMapper.readValue(itemsNode.toString(), new TypeReference<>(){});
+            return objectMapper.readValue(itemsNode.toString(), new TypeReference<>() {
+            });
 
         } catch (JsonProcessingException | IllegalArgumentException e) {
             throw new PillBuddyCustomException(MEDICATION_NOT_FOUND);
+        } catch (ResourceAccessException e) {
+            throw new PillBuddyCustomException(ERROR_CONNECTION);
         }
     }
 
@@ -96,11 +104,12 @@ public class MedicationApiService {
         return URLEncoder.encode(parameter, StandardCharsets.UTF_8);
     }
 
-    @Component
+    @Configuration
     static class RestTemplateConfig{
         @Bean
-        RestTemplate restTemplate() {
-            return new RestTemplate();
+        RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder) {
+
+            return restTemplateBuilder.setConnectTimeout(Duration.ofSeconds(3)).setReadTimeout(Duration.ofSeconds(3)).build();
         }
     }
 }

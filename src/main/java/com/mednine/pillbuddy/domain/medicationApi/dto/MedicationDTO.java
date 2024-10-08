@@ -7,9 +7,9 @@ import lombok.Data;
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MedicationDTO {
-    private String entpName;
-
     private String itemName;
+
+    private String entpName;
 
     private String itemSeq;
 
