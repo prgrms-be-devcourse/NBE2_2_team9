@@ -20,32 +20,36 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
-@Tag(name = "이용자 기능",description = "사이트 이용을 위한 회원가입, 로그인, 로그아웃 기능을 제공한다.")
+@Tag(name = "회원 인증 기능", description = "서비스 이용을 위한 회원가입, 로그인, 로그아웃 기능을 제공한다.")
 public class AuthController {
 
     private final AuthService authService;
-    @Operation(description = "회원가입 기능을 제공한다.")
+
+    @Operation(description = "사용자는 회원가입을 할 수 있다.")
     @PostMapping("/join")
     public ResponseEntity<UserDto> join(@Validated @RequestBody JoinDto joinDto) {
         UserDto userDto = authService.join(joinDto);
 
         return ResponseEntity.ok(userDto);
     }
-    @Operation(description = "로그인을 할 수 있다.")
+
+    @Operation(description = "사용자는 로그인을 할 수 있다.")
     @PostMapping("/login")
     public ResponseEntity<JwtToken> login(@RequestBody LoginDto loginDto) {
         JwtToken jwtToken = authService.login(loginDto);
 
         return ResponseEntity.ok(jwtToken);
     }
-    @Operation(description = "로그아웃을 할 수 있다.")
+
+    @Operation(description = "사용자는 로그아웃을 할 수 있다.")
     @PostMapping("/logout")
     public ResponseEntity<Void> logout() {
         authService.logout();
 
         return ResponseEntity.noContent().build();
     }
-    @Operation(description = "만료된 토큰을 재발급한다.")
+
+    @Operation(description = "사용자는 만료된 Jwt 토큰을 재발급할 수 있다.")
     @PostMapping("/reissue-token")
     public ResponseEntity<JwtToken> reissueToken(@RequestHeader(HttpHeaders.AUTHORIZATION) String bearerToken) {
         JwtToken jwtToken = authService.reissueToken(bearerToken);

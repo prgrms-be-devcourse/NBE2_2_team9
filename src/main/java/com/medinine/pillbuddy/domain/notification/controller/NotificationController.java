@@ -22,10 +22,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/notification")
-@Tag(name = "알림 기능",description = "사용자는 알림 기능을 등록,조회,삭제,수정할 수 있다.")
+@Tag(name = "알림 기능", description = "사용자는 알림 기능을 등록,조회,삭제,수정할 수 있다.")
 public class NotificationController {
 
     private final NotificationService notificationService;
+
     @Operation(description = "사용자는 등록한 약 정보를 통해 알림을 생성할 수 있다.")
     @PostMapping("/{userMedicationId}")
     public ResponseEntity<List<NotificationDTO>> createNotifications(@PathVariable Long userMedicationId) {
@@ -41,14 +42,18 @@ public class NotificationController {
     @Operation(description = "사용자는 설정된 알림 정보를 조회할 수 있다.")
     @GetMapping("/user/{caretakerId}")
     public ResponseEntity<List<UserNotificationDTO>> findNotifications(@PathVariable Long caretakerId) {
+
         return ResponseEntity.ok(notificationService.findNotification(caretakerId));
     }
+
     @Operation(description = "사용자는 설정된 알림 시간을 수정할 수 있다.")
     @PatchMapping("/{notificationId}/{notificationTime}")
     public ResponseEntity<NotificationDTO> updateNotificationTime(
             @PathVariable Long notificationId, @PathVariable LocalDateTime notificationTime) {
+
         return ResponseEntity.ok(notificationService.updateNotification(notificationId, notificationTime));
     }
+
     @Operation(description = "사용자는 설정된 알림 정보를 삭제할 수 있다.")
     @DeleteMapping("/{notificationId}")
     public ResponseEntity<String> deleteNotification(@PathVariable Long notificationId) {
