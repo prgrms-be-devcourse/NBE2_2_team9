@@ -8,7 +8,6 @@ import com.medinine.pillbuddy.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -37,7 +36,7 @@ public class UserController {
     @PutMapping("/{userId}")
     public ResponseEntity<UserDto> updateUserInfo(
             @PathVariable Long userId,
-            @ParameterObject @Validated @RequestBody UserUpdateDto userUpdateDto
+            @Validated @RequestBody UserUpdateDto userUpdateDto
     ) {
         UserDto userDto = userService.updateUserInfo(userId, userUpdateDto);
 
@@ -47,7 +46,7 @@ public class UserController {
     @PutMapping("/{userId}/password")
     public ResponseEntity<UserDto> updateUserPassword(
             @PathVariable Long userId,
-            @ParameterObject @Validated @RequestBody UserPasswordUpdateDto userPasswordUpdateDto
+            @Validated @RequestBody UserPasswordUpdateDto userPasswordUpdateDto
             ) {
         UserDto userDto = userService.updateUserPassword(userId, userPasswordUpdateDto);
 

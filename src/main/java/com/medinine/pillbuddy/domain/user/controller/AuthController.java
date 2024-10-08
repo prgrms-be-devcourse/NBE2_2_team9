@@ -8,7 +8,6 @@ import com.medinine.pillbuddy.global.jwt.JwtToken;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -27,14 +26,14 @@ public class AuthController {
     private final AuthService authService;
     @Operation(description = "회원가입 기능을 제공한다.")
     @PostMapping("/join")
-    public ResponseEntity<UserDto> join(@ParameterObject @Validated @RequestBody JoinDto joinDto) {
+    public ResponseEntity<UserDto> join(@Validated @RequestBody JoinDto joinDto) {
         UserDto userDto = authService.join(joinDto);
 
         return ResponseEntity.ok(userDto);
     }
     @Operation(description = "로그인을 할 수 있다.")
     @PostMapping("/login")
-    public ResponseEntity<JwtToken> login(@ParameterObject @RequestBody LoginDto loginDto) {
+    public ResponseEntity<JwtToken> login(@RequestBody LoginDto loginDto) {
         JwtToken jwtToken = authService.login(loginDto);
 
         return ResponseEntity.ok(jwtToken);

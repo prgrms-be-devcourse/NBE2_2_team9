@@ -19,8 +19,7 @@ public class SwaggerConfig {
                 .description("약 복용 알림 서비스 Pill buddy 입니다.")
                         .contact(new Contact().name("데브코스 백엔드 2차 9팀 medinine").url("https://github.com/prgrms-be-devcourse/NBE2_2_Team9"))
         ).addSecurityItem(new SecurityRequirement().addList("Bearer Authentication"))
-                .components(new Components().addSecuritySchemes("Bearer Authentication",createAPIKeyScheme()))
-                ;
+                .components(new Components().addSecuritySchemes("Bearer Authentication",createAPIKeyScheme()));
     }
     private SecurityScheme createAPIKeyScheme() {
         return new SecurityScheme().type(SecurityScheme.Type.HTTP)
