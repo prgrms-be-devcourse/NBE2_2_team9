@@ -5,7 +5,6 @@ import static com.medinine.pillbuddy.global.exception.ErrorCode.MEDICATION_NOT_F
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.medinine.pillbuddy.domain.medicationApi.dto.MedicationDTO;
 import com.medinine.pillbuddy.domain.medicationApi.dto.MedicationForm;
@@ -40,7 +39,7 @@ public class MedicationApiService {
     private final MedicationApiRepository medicationApiRepository;
     private final ObjectMapper objectMapper;
     private final RestTemplate restTemplate;
-
+    private final int NUM_OF_ROWS = 100;
 
     @Value("${openApi.dataType}")
     private String dataType;
@@ -50,19 +49,18 @@ public class MedicationApiService {
     private String callbackUrl;
 
     public List<MedicationDTO> createDto(MedicationForm medicationForm) {
-
         try {
-            String JsonToString = restTemplate.getForObject(createUrl(medicationForm, 0),
-                    String.class);
-            Integer totalCount = objectMapper.readValue(
-                    objectMapper.readTree(JsonToString).path("body").path("totalCount").toString(), Integer.class);
-            JsonToString = restTemplate.getForObject(createUrl(medicationForm, totalCount),
-                    String.class);
+            String JsonToString = restTemplate.getForObject(createUrl(medicationForm,1), String.class);
+            Double totalCount = getTotalCount(JsonToString);
+            List<MedicationDTO> medicationDTOList = getDtoFromApi(JsonToString);
 
-            JsonNode rootNode = objectMapper.readTree(JsonToString);
-            JsonNode itemsNode = rootNode.path("body").path("items");
-            return objectMapper.readValue(itemsNode.toString(), new TypeReference<>() {
-            });
+            if (totalCount > NUM_OF_ROWS) {
+                for (int i = 2; i <=Math.ceil(totalCount / NUM_OF_ROWS); i++) {
+                    JsonToString = restTemplate.getForObject(createUrl(medicationForm,i), String.class);
+                    medicationDTOList.addAll(getDtoFromApi(JsonToString));
+                }
+            }
+            return medicationDTOList;
 
         } catch (JsonProcessingException | IllegalArgumentException e) {
             throw new PillBuddyCustomException(MEDICATION_NOT_FOUND);
@@ -85,9 +83,17 @@ public class MedicationApiService {
         medicationApiRepository.saveAll(medicationList);
     }
 
-    private URI createUrl(MedicationForm medicationForm, int numOfRows) {
+    private Double getTotalCount(String JsonToString) throws JsonProcessingException {
+        return objectMapper.readValue(objectMapper.readTree(JsonToString).path("body").path("totalCount").toString(), Double.class);
+    }
+
+    private List<MedicationDTO> getDtoFromApi(String JsonToString) throws JsonProcessingException {
+        return objectMapper.readValue(objectMapper.readTree(JsonToString).path("body").path("items").toString(), new TypeReference<>() {});
+    }
+
+    private URI createUrl(MedicationForm medicationForm,int pageNo) {
         String encodedItemName = stringEncoding(medicationForm.getItemName());
-        String url = callbackUrl + "?serviceKey=" + serviceKey + "&type=" + dataType + "&itemName=" + encodedItemName+"&pageNo=1"+"&numOfRows="+numOfRows;
+        String url = callbackUrl + "?serviceKey=" + serviceKey + "&type=" + dataType + "&itemName=" + encodedItemName+"&pageNo="+pageNo+"&numOfRows="+NUM_OF_ROWS;
         if (medicationForm.getEntpName() != null) {
             String encodedEntpName = stringEncoding(medicationForm.getEntpName());
             url += "&entpName=" + encodedEntpName;
