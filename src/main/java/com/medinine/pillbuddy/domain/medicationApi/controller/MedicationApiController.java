@@ -12,7 +12,6 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
@@ -53,16 +52,15 @@ public class MedicationApiController {
             throw new PillBuddyCustomException(ErrorCode.REQUIRED_VALUE);
         }
         //DB에 레코드가 있다면 DB에서 레코드 반환
-        Page<MedicationDTO> allByName = medicationApiService.findAllByName(medicationForm.getItemName(), pageNo - 1, numOfRows);
+        Page<MedicationDTO> MedicationDtoList = medicationApiService.findAllByName(medicationForm.getItemName(), pageNo - 1, numOfRows);
 
-        if (!allByName.isEmpty()) {
-            return new JsonForm((int) allByName.getTotalElements(), pageNo, allByName.getTotalPages(), allByName.getContent());
+        if (!MedicationDtoList.isEmpty()) {
+            return new JsonForm((int) MedicationDtoList.getTotalElements(), pageNo, MedicationDtoList.getTotalPages(), MedicationDtoList.getContent());
         }
         //DB에 레코드가 없다면 외부API 통신을 통해 DB에 레코드를 저장한 후 레코드 반환
-        List<MedicationDTO> medicationDTOS = medicationApiService.createDto(medicationForm);
-        medicationApiService.saveMedication(medicationDTOS);
-        allByName = medicationApiService.findAllByName(medicationForm.getItemName(), pageNo - 1, numOfRows);
+        medicationApiService.saveMedication(medicationApiService.createDto(medicationForm));
+        MedicationDtoList = medicationApiService.findAllByName(medicationForm.getItemName(), pageNo - 1, numOfRows);
 
-        return new JsonForm((int) allByName.getTotalElements(), pageNo, allByName.getTotalPages(), allByName.getContent());
+        return new JsonForm((int) MedicationDtoList.getTotalElements(), pageNo, MedicationDtoList.getTotalPages(), MedicationDtoList.getContent());
     }
 }
