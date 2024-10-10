@@ -11,7 +11,7 @@ public class MedicationDTO {
 
     private String entpName;
 
-    private String itemSeq;
+    private Long itemSeq;
 
     private String efcyQesitm;
 

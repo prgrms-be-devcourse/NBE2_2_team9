@@ -1,27 +1,26 @@
 package com.medinine.pillbuddy.domain.medicationApi.entity;
 
 import com.medinine.pillbuddy.domain.medicationApi.dto.MedicationDTO;
+import com.medinine.pillbuddy.global.entity.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.springframework.data.domain.Persistable;
 
 @Entity
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class Medication{
+public class Medication extends BaseTimeEntity implements Persistable<Long> {
     @Id
-    private String itemSeq;
+    private Long itemSeq;
 
+    @Column(length = 100)
     private String entpName;
 
-    @Column(nullable = false)
+    @Column(nullable = false,length = 100)
     private String itemName;
 
     @Column(columnDefinition = "text")
@@ -38,11 +37,11 @@ public class Medication{
     private String seQesitm;
     @Column(columnDefinition = "text")
     private String depositMethodQesitm;
-
+    @Column(columnDefinition = "text")
     private String itemImagePath;
 
     public static Medication createMedication(MedicationDTO medicationDTO) {
-        Medication medication = Medication.builder().itemName(medicationDTO.getItemName())
+        return Medication.builder().itemName(medicationDTO.getItemName())
                 .entpName(medicationDTO.getEntpName())
                 .itemSeq(medicationDTO.getItemSeq())
                 .efcyQesitm(medicationDTO.getEfcyQesitm())
@@ -53,7 +52,6 @@ public class Medication{
                 .seQesitm(medicationDTO.getSeQesitm())
                 .depositMethodQesitm(medicationDTO.getDepositMethodQesitm())
                 .itemImagePath(medicationDTO.getItemImagePath()).build();
-        return medication;
     }
 
     public static MedicationDTO changeDTO(Medication medication) {
@@ -74,5 +72,13 @@ public class Medication{
     }
 
 
+    @Override
+    public Long getId() {
+        return getItemSeq();
+    }
 
+    @Override
+    public boolean isNew() {
+        return getCreatedAt() == null;
+    }
 }
