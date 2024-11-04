@@ -18,8 +18,10 @@ spring:
 
 oauth:
   kakao:
+    oauth2-password: G2#jX9p!QkLz7@1m
     client-id: 9bd1708961f4f4633d9b1ddbac5e6fdf
-    redirect-uri: http://localhost:8080/api/users/oauth/login
+    caregiver-redirect-uri: http://localhost:8080/api/users/oauth/login/caregiver
+    caretaker-redirect-uri: http://localhost:8080/api/users/oauth/login/caretaker
     authorization-grant-type: authorization_code
     authorization-uri: https://kauth.kakao.com/oauth/authorize
     token-uri: https://kauth.kakao.com/oauth/token

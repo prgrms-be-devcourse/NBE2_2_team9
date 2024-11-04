@@ -7,7 +7,8 @@ import org.springframework.stereotype.Component;
 public class KakaoProperty {
 
     public static String KAKAO_CLIENT_ID;
-    public static String KAKAO_REDIRECT_URI;
+    public static String KAKAO_CAREGIVER_REDIRECT_URI;
+    public static String KAKAO_CARETAKER_REDIRECT_URI;
     public static String KAKAO_AUTHORIZATION_GRANT_TYPE;
     public static String KAKAO_AUTHORIZATION_URI;
     public static String KAKAO_TOKEN_URI;
@@ -19,9 +20,14 @@ public class KakaoProperty {
         KAKAO_CLIENT_ID = clientId;
     }
 
-    @Value("${oauth.kakao.redirect-uri}")
-    public void setRedirectUri(String redirectUri) {
-        KAKAO_REDIRECT_URI = redirectUri;
+    @Value("${oauth.kakao.caregiver-redirect-uri}")
+    public void setCaregiverRedirectUri(String redirectUri) {
+        KAKAO_CAREGIVER_REDIRECT_URI = redirectUri;
+    }
+
+    @Value("${oauth.kakao.caretaker-redirect-uri}")
+    public void setCaretakerRedirectUri(String redirectUri) {
+        KAKAO_CARETAKER_REDIRECT_URI = redirectUri;
     }
 
     @Value("${oauth.kakao.authorization-grant-type}")
