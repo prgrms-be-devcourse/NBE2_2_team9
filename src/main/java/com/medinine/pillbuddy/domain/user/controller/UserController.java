@@ -2,7 +2,7 @@ package com.medinine.pillbuddy.domain.user.controller;
 
 import com.medinine.pillbuddy.domain.user.dto.UserDto;
 import com.medinine.pillbuddy.domain.user.dto.UserPasswordUpdateDto;
-import com.medinine.pillbuddy.domain.user.dto.UserType;
+import com.medinine.pillbuddy.domain.user.entity.UserType;
 import com.medinine.pillbuddy.domain.user.dto.UserUpdateDto;
 import com.medinine.pillbuddy.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;

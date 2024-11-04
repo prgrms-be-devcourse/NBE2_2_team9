@@ -1,5 +1,6 @@
 package com.medinine.pillbuddy.domain.user.dto;
 
+import com.medinine.pillbuddy.domain.user.entity.UserType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;

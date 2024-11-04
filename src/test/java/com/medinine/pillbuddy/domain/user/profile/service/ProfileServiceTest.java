@@ -2,7 +2,7 @@ package com.medinine.pillbuddy.domain.user.profile.service;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
-import com.medinine.pillbuddy.domain.user.dto.UserType;
+import com.medinine.pillbuddy.domain.user.entity.UserType;
 import com.medinine.pillbuddy.domain.user.profile.dto.ProfileUploadDto;
 import com.medinine.pillbuddy.global.exception.ErrorCode;
 import com.medinine.pillbuddy.global.exception.PillBuddyCustomException;

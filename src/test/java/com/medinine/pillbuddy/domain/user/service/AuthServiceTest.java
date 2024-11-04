@@ -10,7 +10,7 @@ import com.medinine.pillbuddy.domain.user.caretaker.repository.CaretakerReposito
 import com.medinine.pillbuddy.domain.user.dto.JoinDto;
 import com.medinine.pillbuddy.domain.user.dto.LoginDto;
 import com.medinine.pillbuddy.domain.user.dto.UserDto;
-import com.medinine.pillbuddy.domain.user.dto.UserType;
+import com.medinine.pillbuddy.domain.user.entity.UserType;
 import com.medinine.pillbuddy.domain.user.entity.Role;
 import com.medinine.pillbuddy.global.exception.ErrorCode;
 import com.medinine.pillbuddy.global.exception.PillBuddyCustomException;
