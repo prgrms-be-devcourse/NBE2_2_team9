@@ -1,19 +1,17 @@
-package com.medinine.pillbuddy.domain.user.oauth.service;
+package com.medinine.pillbuddy.domain.user.oauth.service.kakao;
 
 import static com.medinine.pillbuddy.global.oauth.KakaoProperty.KAKAO_AUTHORIZATION_GRANT_TYPE;
-import static com.medinine.pillbuddy.global.oauth.KakaoProperty.KAKAO_AUTHORIZATION_URI;
-import static com.medinine.pillbuddy.global.oauth.KakaoProperty.KAKAO_CAREGIVER_REDIRECT_URI;
-import static com.medinine.pillbuddy.global.oauth.KakaoProperty.KAKAO_CARETAKER_REDIRECT_URI;
 import static com.medinine.pillbuddy.global.oauth.KakaoProperty.KAKAO_CLIENT_ID;
-import static com.medinine.pillbuddy.global.oauth.KakaoProperty.KAKAO_OAUTH_QUERY_STRING;
 import static com.medinine.pillbuddy.global.oauth.KakaoProperty.KAKAO_TOKEN_URI;
 import static com.medinine.pillbuddy.global.oauth.KakaoProperty.KAKAO_USER_INFO_URI;
 
 import com.medinine.pillbuddy.domain.user.entity.UserType;
-import com.medinine.pillbuddy.domain.user.oauth.dto.KakaoProfile;
 import com.medinine.pillbuddy.domain.user.oauth.dto.KakaoTokenResponse;
+import com.medinine.pillbuddy.domain.user.oauth.dto.OAuthProfile;
+import com.medinine.pillbuddy.domain.user.oauth.service.OAuthService;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
@@ -21,15 +19,18 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-@Component
 @Slf4j
-public class KakaoClient {
+@Component
+@RequiredArgsConstructor
+public class KakaoOAuthService implements OAuthService {
 
-    public String getConnectionUrl(UserType userType) {
-        return switch (userType) {
-            case CAREGIVER -> KAKAO_AUTHORIZATION_URI + String.format(KAKAO_OAUTH_QUERY_STRING, KAKAO_CLIENT_ID, KAKAO_CAREGIVER_REDIRECT_URI);
-            case CARETAKER -> KAKAO_AUTHORIZATION_URI + String.format(KAKAO_OAUTH_QUERY_STRING, KAKAO_CLIENT_ID, KAKAO_CARETAKER_REDIRECT_URI);
-        };
+    @Override
+    public OAuthProfile getUserInfo(String code, UserType userType) {
+        // code 를 통해 카카오 서버로 Token 요청 (POST 요청)
+        String accessToken = getAccessToken(code);
+
+        // Token 을 통해 카카오 서버로 사용자 데이터 요청 (POST 요청)
+        return getUserInfo(accessToken);
     }
 
     public String getAccessToken(String code) {
@@ -60,8 +61,8 @@ public class KakaoClient {
         );
     }
 
-    public KakaoProfile getUserInfo(String accessToken) {
-        Optional<KakaoProfile> profile = WebClient.create(KAKAO_USER_INFO_URI)
+    public OAuthProfile getUserInfo(String accessToken) {
+        Optional<OAuthProfile> profile = WebClient.create(KAKAO_USER_INFO_URI)
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .scheme("https")
@@ -77,7 +78,7 @@ public class KakaoClient {
                     log.error("- getUserInfo() => 5xx Server Error: {}", clientResponse.statusCode());
                     return Mono.error(new RuntimeException("Internal Server Error"));
                 })
-                .bodyToMono(KakaoProfile.class)
+                .bodyToMono(OAuthProfile.class)
                 .blockOptional();
 
         log.info("kakao user info => {}", profile);

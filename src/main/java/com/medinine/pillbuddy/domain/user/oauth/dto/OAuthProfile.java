@@ -11,7 +11,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class KakaoProfile {
+public class OAuthProfile {
 
     // ## 회원 번호
     @JsonProperty("id")
