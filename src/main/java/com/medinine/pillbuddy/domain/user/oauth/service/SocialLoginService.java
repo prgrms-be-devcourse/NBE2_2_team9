@@ -28,7 +28,7 @@ public class SocialLoginService {
         OAuthProfile userInfo = oAuthService.getUserInfo(code, userType);
 
         if (!userReader.isNewUser(userInfo.getEmail(), userType)) {
-            userReader.registerUser(userInfo, userType);
+            userReader.registerUser(userInfo, userType, registrationId);
         }
 
         String loginID = userReader.getUserLoginID(userInfo.getEmail(), userType);

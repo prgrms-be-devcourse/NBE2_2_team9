@@ -6,8 +6,9 @@ import static com.medinine.pillbuddy.global.oauth.KakaoProperty.KAKAO_TOKEN_URI;
 import static com.medinine.pillbuddy.global.oauth.KakaoProperty.KAKAO_USER_INFO_URI;
 
 import com.medinine.pillbuddy.domain.user.entity.UserType;
-import com.medinine.pillbuddy.domain.user.oauth.dto.KakaoTokenResponse;
+import com.medinine.pillbuddy.domain.user.oauth.dto.KakaoUserResponse;
 import com.medinine.pillbuddy.domain.user.oauth.dto.OAuthProfile;
+import com.medinine.pillbuddy.domain.user.oauth.dto.OAuthTokenResponse;
 import com.medinine.pillbuddy.domain.user.oauth.service.OAuthService;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import java.util.Optional;
@@ -33,8 +34,9 @@ public class KakaoOAuthService implements OAuthService {
         return getUserInfo(accessToken);
     }
 
+    @Override
     public String getAccessToken(String code) {
-        Optional<KakaoTokenResponse> kakaoTokenResponse = WebClient.create(KAKAO_TOKEN_URI).post()
+        Optional<OAuthTokenResponse> kakaoTokenResponse = WebClient.create(KAKAO_TOKEN_URI).post()
                 .uri(uriBuilder -> uriBuilder
                         .scheme("https")
                         .queryParam("grant_type", KAKAO_AUTHORIZATION_GRANT_TYPE)
@@ -51,18 +53,19 @@ public class KakaoOAuthService implements OAuthService {
                     log.error("- getAccessToken() => 5xx Server Error: {}", clientResponse.statusCode());
                     return Mono.error(new RuntimeException("Internal Server Error"));
                 })
-                .bodyToMono(KakaoTokenResponse.class)
+                .bodyToMono(OAuthTokenResponse.class)
                 .blockOptional();
 
         log.info("kakao token response => {}", kakaoTokenResponse);
 
-        return kakaoTokenResponse.map(KakaoTokenResponse::getAccessToken).orElseThrow(
+        return kakaoTokenResponse.map(OAuthTokenResponse::getAccessToken).orElseThrow(
                 () -> new IllegalArgumentException("카카오 엑세스 토큰을 찾을 수 없습니다.")
         );
     }
 
+    @Override
     public OAuthProfile getUserInfo(String accessToken) {
-        Optional<OAuthProfile> profile = WebClient.create(KAKAO_USER_INFO_URI)
+        Optional<KakaoUserResponse> profile = WebClient.create(KAKAO_USER_INFO_URI)
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .scheme("https")
@@ -78,11 +81,17 @@ public class KakaoOAuthService implements OAuthService {
                     log.error("- getUserInfo() => 5xx Server Error: {}", clientResponse.statusCode());
                     return Mono.error(new RuntimeException("Internal Server Error"));
                 })
-                .bodyToMono(OAuthProfile.class)
+                .bodyToMono(KakaoUserResponse.class)
                 .blockOptional();
 
         log.info("kakao user info => {}", profile);
+        KakaoUserResponse response = profile.orElseThrow(
+                () -> new IllegalArgumentException("카카오 사용자 정보를 찾을 수 없습니다."));
 
-        return profile.orElseThrow(() -> new IllegalArgumentException("카카오 사용자 정보를 찾을 수 없습니다."));
+        return OAuthProfile.builder()
+                .id(String.valueOf(response.getId()))
+                .nickname(response.getProperties().get("nickname"))
+                .email(response.getEmail())
+                .build();
     }
 }

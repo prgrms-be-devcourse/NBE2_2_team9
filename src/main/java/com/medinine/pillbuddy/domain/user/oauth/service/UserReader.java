@@ -32,10 +32,11 @@ public class UserReader {
         };
     }
 
-    public void registerUser(OAuthProfile profile, UserType userType) {
-        String loginId = "kakao_" + profile.getId();
+    public void registerUser(OAuthProfile profile, UserType userType, String registrationId) {
+        String loginId = registrationId + "_" + profile.getId();
         String encodedPassword = passwordEncoder.encode(oauth2Password);
-        String username = profile.getProperties().get("nickname");
+        String username = profile.getNickname();
+        String phoneNumber = profile.getPhoneNumber().replaceAll("-", "");
 
         switch (userType) {
             case CARETAKER -> {
@@ -44,6 +45,7 @@ public class UserReader {
                         .loginId(loginId)
                         .email(profile.getEmail())
                         .password(encodedPassword)
+                        .phoneNumber(phoneNumber)
                         .role(Role.USER)
                         .build();
                 caretakerRepository.save(caretaker);
@@ -54,6 +56,7 @@ public class UserReader {
                         .loginId(loginId)
                         .email(profile.getEmail())
                         .password(encodedPassword)
+                        .phoneNumber(phoneNumber)
                         .role(Role.USER)
                         .build();
                 caregiverRepository.save(caregiver);

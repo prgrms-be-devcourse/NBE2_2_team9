@@ -10,7 +10,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class KakaoTokenResponse {
+public class OAuthTokenResponse {
 
     @JsonProperty("token_type")
     public String tokenType;

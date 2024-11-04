@@ -1,7 +1,7 @@
 package com.medinine.pillbuddy.domain.user.oauth.controller;
 
 import com.medinine.pillbuddy.domain.user.entity.UserType;
-import com.medinine.pillbuddy.domain.user.oauth.service.KakaoAuthService;
+import com.medinine.pillbuddy.domain.user.oauth.service.SocialLoginService;
 import com.medinine.pillbuddy.global.jwt.JwtToken;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,18 +18,28 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("/api/users/oauth")
 public class OAuthController {
 
-    private final KakaoAuthService kakaoAuthService;
+    private final SocialLoginService socialLoginService;
 
-    @GetMapping("/connection")
-    public ResponseEntity<String> loginPage(@RequestParam UserType userType) {
-        String location = kakaoAuthService.getConnectionUrl(userType);
+    @GetMapping("/connection/kakao")
+    public ResponseEntity<String> getConnectionByKakao(@RequestParam UserType userType) {
+        String location = socialLoginService.getConnectionUrl(userType, "kakao");
 
         return ResponseEntity.ok(location);
     }
 
-    @GetMapping("/login/{userType}")
-    public ResponseEntity<JwtToken> login(@RequestParam String code, @PathVariable String userType) {
-        JwtToken jwtToken = kakaoAuthService.login(code, UserType.from(userType));
+    @GetMapping("/connection/naver")
+    public ResponseEntity<String> getConnectionByNaver(@RequestParam UserType userType) {
+        String location = socialLoginService.getConnectionUrl(userType, "naver");
+
+        return ResponseEntity.ok(location);
+    }
+
+    @GetMapping("/login/{registrationId}/{userType}")
+    public ResponseEntity<JwtToken> login(
+            @RequestParam String code,
+            @PathVariable String userType,
+            @PathVariable String registrationId) {
+        JwtToken jwtToken = socialLoginService.login(code, UserType.from(userType), registrationId);
 
         return ResponseEntity.ok(jwtToken);
     }
