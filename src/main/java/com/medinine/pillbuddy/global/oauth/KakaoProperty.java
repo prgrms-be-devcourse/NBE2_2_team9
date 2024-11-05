@@ -10,10 +10,6 @@ public class KakaoProperty {
     public static String KAKAO_CAREGIVER_REDIRECT_URI;
     public static String KAKAO_CARETAKER_REDIRECT_URI;
     public static String KAKAO_AUTHORIZATION_GRANT_TYPE;
-    public static String KAKAO_AUTHORIZATION_URI;
-    public static String KAKAO_TOKEN_URI;
-    public static String KAKAO_USER_INFO_URI;
-    public static String KAKAO_OAUTH_QUERY_STRING = "?response_type=code&client_id=%s&redirect_uri=%s";
 
     @Value("${oauth.kakao.client-id}")
     public void setClientId(String clientId) {
@@ -33,20 +29,5 @@ public class KakaoProperty {
     @Value("${oauth.kakao.authorization-grant-type}")
     public void setAuthorizationGrantType(String authorizationGrantType) {
         KAKAO_AUTHORIZATION_GRANT_TYPE = authorizationGrantType;
-    }
-
-    @Value("${oauth.kakao.authorization-uri}")
-    public void setAuthorizationUri(String authorizationUri) {
-        KAKAO_AUTHORIZATION_URI = authorizationUri;
-    }
-
-    @Value("${oauth.kakao.token-uri}")
-    public void setTokenUri(String tokenUri) {
-        KAKAO_TOKEN_URI = tokenUri;
-    }
-
-    @Value("${oauth.kakao.user-info-uri}")
-    public void setUserInfoUri(String userInfoUri) {
-        KAKAO_USER_INFO_URI = userInfoUri;
     }
 }

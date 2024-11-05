@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class UserReader {
 
-    @Value("${oauth.kakao.oauth2-password}")
+    @Value("${oauth.oauth2-password}")
     private String oauth2Password;
 
     private final CaretakerRepository caretakerRepository;
@@ -36,7 +36,11 @@ public class UserReader {
         String loginId = registrationId + "_" + profile.getId();
         String encodedPassword = passwordEncoder.encode(oauth2Password);
         String username = profile.getNickname();
-        String phoneNumber = profile.getPhoneNumber().replaceAll("-", "");
+        String phoneNumber = null;
+
+        if (profile.getPhoneNumber() != null) {
+            phoneNumber = profile.getPhoneNumber().replaceAll("-", "");
+        }
 
         switch (userType) {
             case CARETAKER -> {

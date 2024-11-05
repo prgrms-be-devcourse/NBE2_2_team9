@@ -12,20 +12,18 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class SocialLoginService {
 
-    private final Map<String, OAuthService> oAuthServiceMap;
     private final Map<String, OAuthClient> oAuthClientMap;
-
     private final UserReader userReader;
     private final JwtTokenProvider jwtTokenProvider;
 
     public String getConnectionUrl(UserType userType, String registrationId) {
-        OAuthClient oAuthClient = oAuthClientMap.get(registrationId + "OAuthClient");
+        OAuthClient oAuthClient = oAuthClientMap.get(registrationId + "Client");
         return oAuthClient.getConnectionUrl(userType);
     }
 
     public JwtToken login(String code, UserType userType, String registrationId) {
-        OAuthService oAuthService = oAuthServiceMap.get(registrationId + "OAuthService");
-        OAuthProfile userInfo = oAuthService.getUserInfo(code, userType);
+        OAuthClient oAuthClient = oAuthClientMap.get(registrationId + "Client");
+        OAuthProfile userInfo = oAuthClient.getUserInfo(code);
 
         if (!userReader.isNewUser(userInfo.getEmail(), userType)) {
             userReader.registerUser(userInfo, userType, registrationId);
