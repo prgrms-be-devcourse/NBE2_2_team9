@@ -35,21 +35,18 @@ jwt:
     refresh-expiration-time: 18000000
 
 oauth:
+  oauth2-password: G2#jX9p!QkLz7@1m
   kakao:
-    oauth2-password: G2#jX9p!QkLz7@1m
     client-id: 9bd1708961f4f4633d9b1ddbac5e6fdf
     caregiver-redirect-uri: http://localhost:8080/api/users/oauth/login/kakao/caregiver
     caretaker-redirect-uri: http://localhost:8080/api/users/oauth/login/kakao/caretaker
     authorization-grant-type: authorization_code
-    authorization-uri: https://kauth.kakao.com/oauth/authorize
-    token-uri: https://kauth.kakao.com/oauth/token
-    user-info-uri: https://kapi.kakao.com/v2/user/me
   naver:
     client-id: hnbpAIMGBX9g1Or5whlW
     client-secret: bjZMcu_VCW
     caregiver-redirect-uri: http://localhost:8080/api/users/oauth/login/naver/caregiver
     caretaker-redirect-uri: http://localhost:8080/api/users/oauth/login/naver/caretaker
-    authorization-uri: https://nid.naver.com/oauth2.0/authorize
+    authorization-grant-type: authorization_code
 
 file:
   path: test-upload
