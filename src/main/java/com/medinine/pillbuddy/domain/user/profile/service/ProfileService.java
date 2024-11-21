@@ -1,6 +1,6 @@
 package com.medinine.pillbuddy.domain.user.profile.service;
 
-import com.medinine.pillbuddy.domain.user.dto.UserType;
+import com.medinine.pillbuddy.domain.user.entity.UserType;
 import com.medinine.pillbuddy.domain.user.profile.dto.ProfileUploadDto;
 import com.medinine.pillbuddy.domain.user.profile.service.uploader.CaregiverProfileUploader;
 import com.medinine.pillbuddy.domain.user.profile.service.uploader.CaretakerProfileUploader;

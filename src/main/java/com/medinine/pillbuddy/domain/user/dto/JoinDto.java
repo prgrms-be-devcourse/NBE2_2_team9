@@ -3,6 +3,7 @@ package com.medinine.pillbuddy.domain.user.dto;
 import com.medinine.pillbuddy.domain.user.caregiver.entity.Caregiver;
 import com.medinine.pillbuddy.domain.user.caretaker.entity.Caretaker;
 import com.medinine.pillbuddy.domain.user.entity.Role;
+import com.medinine.pillbuddy.domain.user.entity.UserType;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

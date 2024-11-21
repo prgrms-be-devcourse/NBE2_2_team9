@@ -6,7 +6,7 @@ import com.medinine.pillbuddy.domain.user.caretaker.entity.Caretaker;
 import com.medinine.pillbuddy.domain.user.caretaker.repository.CaretakerRepository;
 import com.medinine.pillbuddy.domain.user.dto.UserDto;
 import com.medinine.pillbuddy.domain.user.dto.UserPasswordUpdateDto;
-import com.medinine.pillbuddy.domain.user.dto.UserType;
+import com.medinine.pillbuddy.domain.user.entity.UserType;
 import com.medinine.pillbuddy.domain.user.dto.UserUpdateDto;
 import com.medinine.pillbuddy.domain.user.entity.User;
 import com.medinine.pillbuddy.domain.user.profile.entity.Image;

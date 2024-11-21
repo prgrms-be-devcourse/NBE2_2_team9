@@ -1,6 +1,6 @@
 package com.medinine.pillbuddy.domain.user.profile.dto;
 
-import com.medinine.pillbuddy.domain.user.dto.UserType;
+import com.medinine.pillbuddy.domain.user.entity.UserType;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

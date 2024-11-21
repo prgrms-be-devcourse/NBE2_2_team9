@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface CaretakerRepository extends JpaRepository<Caretaker, Long> {
 
     Optional<Caretaker> findByLoginId(String loginId);
+    Optional<Caretaker> findByEmail(String email);
     boolean existsByLoginId(String loginId);
     boolean existsByEmail(String email);
     boolean existsByPhoneNumber(String phoneNumber);

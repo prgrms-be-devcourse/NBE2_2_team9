@@ -28,7 +28,12 @@ public enum ErrorCode {
     JWT_TOKEN_INVALID(UNAUTHORIZED, "유효하지 않은 JWT 토큰입니다."),
     JWT_TOKEN_EXPIRED(UNAUTHORIZED, "JWT 토큰이 만료되었습니다."),
     JWT_TOKEN_UNSUPPORTED(BAD_REQUEST, "지원되지 않는 JWT 토큰입니다."),
-  
+
+    SOCIAL_UNAUTHORIZED(UNAUTHORIZED, "소셜 인증이 필요합니다."),
+    SOCIAL_FORBIDDEN(FORBIDDEN, "요청한 리소스에 대한 권한이 없습니다."),
+    SOCIAL_EXPIRED_TOKEN(UNAUTHORIZED, "소셜 토큰이 만료되었습니다."),
+    SOCIAL_BAD_REQUEST(BAD_REQUEST, "잘못된 요청입니다."),
+
     MEDICATION_NOT_FOUND(NOT_FOUND, "약 정보를 찾을 수 없습니다."),
     MEDICATION_NOT_MATCHED(BAD_REQUEST, "약 정보가 일치하지 않습니다."),
     MEDICATION_NOT_REMOVED(CONFLICT, "약 정보 삭제에 실패했습니다."),
